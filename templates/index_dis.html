@@ -940,9 +940,10 @@
             let interval = setInterval(() => {
                 dots = (dots + 1) % 4;
                 const textEl = thinkingDiv.querySelector("div");
-                if (textEl) {
-                    textEl.innerText = "Pak Dahlan sedang berpikir" + ".".repeat(dots);
-                }
+
+                if (!textEl) return;
+
+                textEl.innerText = "Pak Dahlan sedang berpikir" + ".".repeat(dots);
             }, 400);
 
 
