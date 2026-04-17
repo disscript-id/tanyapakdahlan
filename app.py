@@ -3,6 +3,7 @@ import sqlite3
 import random
 import time
 import uuid
+import traceback
 from datetime import timedelta
 
 from dotenv import load_dotenv
@@ -1291,6 +1292,7 @@ Jawaban:
 
     except Exception as e:
         print("Mood classify error:", e)
+        print(traceback.format_exc())
         return "Netral"
 
 
@@ -1316,8 +1318,11 @@ def ask():
     chat_history = session["chat_history"]
     recent_history = chat_history[-6:]
 
+    time.sleep(0.5)
+
     start_time = time.time()
     answer = generate_answer(question, recent_history)
+
     end_time = time.time()
     response_time = int((end_time - start_time) * 1000)
 
@@ -1379,8 +1384,10 @@ def ask():
         )
         conn.commit()
         conn.close()
+
     except Exception as e:
         print(f"Log Error: {e}")
+        print(traceback.format_exc())
 
     return jsonify({"answer": answer})
 
@@ -1423,8 +1430,10 @@ def submit_feedback():
         )
         conn.commit()
         conn.close()
+
     except Exception as e:
         print(f"Feedback Error: {e}")
+        print(traceback.format_exc())
         return jsonify({"status": "error", "message": "Gagal menyimpan masukan."}), 500
 
     return jsonify({"status": "ok", "message": "Masukan berhasil disimpan."})

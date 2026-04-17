@@ -928,9 +928,23 @@
 
             let thinkingDiv = document.createElement("div");
             thinkingDiv.className = "message pakdahlan";
-            thinkingDiv.innerHTML = '<img class="ai-avatar" src="/static/icon_tanya_dis.png" alt="Avatar"> <div style="color:#aeb6c2; font-style: italic;">Sedang mencari jawaban...</div>';
+            thinkingDiv.innerHTML = `
+                <img class="ai-avatar" src="/static/icon_tanya_dis.png" alt="Avatar">
+                <div style="color:#aeb6c2; font-style: italic;">Pak Dahlan sedang berpikir...</div>
+            `;
             chat.appendChild(thinkingDiv);
             chat.scrollTop = chat.scrollHeight;
+
+            let dots = 0;
+
+            let interval = setInterval(() => {
+                dots = (dots + 1) % 4;
+                const textEl = thinkingDiv.querySelector("div");
+                if (textEl) {
+                    textEl.innerText = "Pak Dahlan sedang berpikir" + ".".repeat(dots);
+                }
+            }, 400);
+
 
             try {
                 let res = await fetch("/ask", {
@@ -942,6 +956,7 @@
                 let data = await res.json();
 
                 if (thinkingDiv.parentNode) {
+                    clearInterval(interval);
                     chat.removeChild(thinkingDiv);
                 }
 
@@ -969,6 +984,7 @@
 
             } catch (e) {
                 if (thinkingDiv.parentNode) {
+                    clearInterval(interval);
                     chat.removeChild(thinkingDiv);
                 }
                 alert("Gagal memuat jawaban.");
