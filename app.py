@@ -23,10 +23,9 @@ app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "ganti-secret-key-anda")
 app.permanent_session_lifetime = timedelta(minutes=60)
 
-DB_PATH = os.path.join("data", "pak_dahlan_ai.db")
+DB_PATH = "/data/pak_dahlan_ai.db"
 
-# ✅ pastikan folder data selalu ada (PENTING untuk Render)
-os.makedirs("data", exist_ok=True)
+
 
 MAX_ACTIVE_USERS = int(os.getenv("MAX_ACTIVE_USERS", "25"))
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "2026pro")
