@@ -23,6 +23,10 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY", "ganti-secret-key-anda")
 app.permanent_session_lifetime = timedelta(minutes=60)
 
 DB_PATH = os.path.join("data", "pak_dahlan_ai.db")
+
+# ✅ pastikan folder data selalu ada (PENTING untuk Render)
+os.makedirs("data", exist_ok=True)
+
 MAX_ACTIVE_USERS = int(os.getenv("MAX_ACTIVE_USERS", "25"))
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "2026pro")
 ADMIN_INSIGHT_PASSWORD = os.getenv("ADMIN_INSIGHT_PASSWORD", "insight2026")
@@ -893,7 +897,20 @@ def request_access():
     if not name or not phone:
         return redirect("/akses")
 
+
+
     conn = get_db_connection()
+
+    # ✅ CEK: apakah nomor sudah jadi user aktif
+    existing_user = conn.execute(
+        "SELECT id FROM users WHERE phone = ?",
+        (phone,)
+    ).fetchone()
+
+    if existing_user:
+        conn.close()
+        session["flash_error"] = "Nomor WhatsApp ini sudah aktif. Silakan login."
+        return redirect("/akses")
 
     # 🔴 CEK: apakah nomor sudah pernah daftar
     existing = conn.execute(
@@ -1425,7 +1442,8 @@ def inject_flash_messages():
     )
 
 
+init_db()
+seed_initial_users()
+
 if __name__ == "__main__":
-    init_db()
-    seed_initial_users()
     app.run(host="0.0.0.0", port=5000, debug=True)
