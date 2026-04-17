@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIN Berhasil Dibuat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f1115;
+            color: white;
+            padding: 30px;
+            line-height: 1.6;
+        }
+
+        .card {
+            max-width: 760px;
+            margin: 0 auto;
+            background: #171a21;
+            border: 1px solid #2a2f3a;
+            border-radius: 14px;
+            padding: 24px;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background: #11141a;
+            border: 1px solid #2a2f3a;
+            border-radius: 10px;
+            padding: 16px;
+            color: #dfe7ff;
+            font-size: 15px;
+        }
+
+        .actions {
+            margin-top: 18px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #4da6ff;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #2a2f3a;
+            color: white;
+        }
+
+        .note {
+            margin-top: 16px;
+            color: #b9c3d6;
+            font-size: 14px;
+        }
+
+        #copyStatus {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #9ed0ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>PIN Berhasil Dibuat</h2>
+
+        <pre id="waText">Halo {{ name }}.
+
+Akses uji coba Tanya Pak Dahlan sudah aktif.
+
+Silakan login:
+{{ app_base_url }}
+
+Nomor WA: {{ phone }}
+PIN: {{ pin }}
+
+Terima kasih atas partisipasinya.</pre>
+
+        <div class="actions">
+            <button class="btn btn-primary" onclick="copyWAText()">Copy Teks WA</button>
+            <a class="btn btn-secondary" href="/admin">Kembali ke Admin</a>
+        </div>
+
+        <div id="copyStatus"></div>
+
+        <div class="note">
+            PIN hanya tampil sekali. Setelah ini, yang tersimpan hanya hash PIN.
+        </div>
+    </div>
+
+    <script>
+        async function copyWAText() {
+            const text = document.getElementById("waText").innerText;
+            const status = document.getElementById("copyStatus");
+
+            try {
+                await navigator.clipboard.writeText(text);
+                status.innerText = "Teks WA berhasil disalin.";
+            } catch (err) {
+                // fallback untuk browser tertentu
+                const temp = document.createElement("textarea");
+                temp.value = text;
+                document.body.appendChild(temp);
+                temp.select();
+                document.execCommand("copy");
+                document.body.removeChild(temp);
+                status.innerText = "Teks WA berhasil disalin.";
+            }
+        }
+    </script>
+</body>
+</html>

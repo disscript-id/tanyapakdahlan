@@ -1,0 +1,8 @@
+flask
+gunicorn
+openai
+python-dotenv
+werkzeug
+google-generativeai
+numpy
+

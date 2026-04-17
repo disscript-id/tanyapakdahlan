@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Insight Admin</title>
+    <style>
+        :root {
+            --bg: #0d1017;
+            --card: rgba(255,255,255,0.05);
+            --border: rgba(255,255,255,0.08);
+            --text: #edf1f7;
+            --muted: #a6b0bf;
+            --accent: #8ab4f8;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 420px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            backdrop-filter: blur(8px);
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 26px;
+        }
+
+        .sub {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .notice {
+            background: rgba(255, 120, 120, 0.12);
+            border: 1px solid rgba(255, 120, 120, 0.20);
+            color: #ffe5e5;
+            padding: 12px 14px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 14px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: rgba(0,0,0,0.25);
+            color: white;
+            outline: none;
+            font-size: 15px;
+            margin-bottom: 14px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+
+        button, a {
+            flex: 1;
+            min-width: 130px;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            padding: 13px 14px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-family: inherit;
+        }
+
+        .btn-main {
+            background: rgba(138,180,248,0.18);
+            border: 1px solid rgba(138,180,248,0.22);
+            color: white;
+        }
+
+        .btn-back {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Masuk ke Insight</h1>
+        <div class="sub">
+            dashboard pengembangan sistem Tanya Pak Dahlan.
+        </div>
+
+        {% if admin_error %}
+        <div class="notice">{{ admin_error }}</div>
+        {% endif %}
+
+        <form method="POST" action="/admin/insight-login">
+            <label for="password">Password Insight</label>
+            <input type="password" id="password" name="password" placeholder="Masukkan password insight" required>
+
+            <div class="actions">
+                <button class="btn-main" type="submit">Masuk ke Insight</button>
+                <a class="btn-back" href="/admin">Kembali ke Admin</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

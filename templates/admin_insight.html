@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Insight</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+
+        :root {
+            --accent-blue: #6ea8fe;
+            --accent-green: #63d2b0;
+            --accent-yellow: #f6c177;
+            --accent-red: #ef6b73;
+            --accent-purple: #b197fc;
+            --accent-soft: rgba(255,255,255,0.04);
+        }
+
+        body {
+            background: #0f1115;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+
+        h2, h3 {
+            margin-top: 0;
+        }
+          
+
+        .page-title {
+            margin-bottom: 18px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            position: relative;
+            background: #171a21;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #2a2f3a;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+            min-width: 0;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .card:hover {
+            border-color: rgba(255,255,255,0.08);
+        }
+
+        .metric-title {
+            font-size: 14px;
+            color: #aab2bf;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .metric-value.good {
+            color: var(--accent-green);
+        }
+
+        .metric-value.warn {
+            color: var(--accent-yellow);
+        }
+
+        .metric-value.bad {
+            color: var(--accent-red);
+        }
+
+        .metric-value.info {
+            color: var(--accent-blue);
+        }
+
+        .metric-sub {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #8e97a4;
+        }
+
+        .section-title {
+            margin: 32px 0 14px;
+            font-size: 20px;
+            color: #e7ebf3;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+            align-items: start;
+        }
+
+        .grid-2 > * {
+            min-width: 0;
+        }
+
+        .chart-wrap {
+            position: relative;
+            width: 100%;
+            min-height: 280px;
+        }
+
+        canvas {
+            background: #11141a;
+            border-radius: 10px;
+            padding: 10px;
+            display: block;
+            width: 100% !important;
+            max-width: 100%;
+            height: 280px !important;
+            box-sizing: border-box;
+        }
+
+        .list-wrap ul {
+            margin: 0;
+            padding-left: 20px;
+            line-height: 1.7;
+        }
+
+        .list-wrap li {
+            margin-bottom: 8px;
+        }
+
+        .small {
+            color: #aab2bf;
+            font-size: 13px;
+        }
+
+        .table-card {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 0;
+            border-collapse: collapse;
+            color: white;
+            font-size: 14px;
+            table-layout: fixed;
+        }
+
+        th, td {
+            border-bottom: 1px solid #2a2f3a;
+            padding: 12px 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            color: #aab2bf;
+            font-weight: 600;
+            background: #141820;
+        }
+
+        tr:hover td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .snippet {
+            max-width: 520px;
+            white-space: normal;
+            word-break: break-word;
+            line-height: 1.55;
+        }
+
+        @media (max-width: 960px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            canvas {
+                height: 260px !important;
+            }
+        }
+
+        .expandable-row {
+            cursor: pointer;
+        }
+
+        .expand-detail {
+            display: none;
+            background: #11141a;
+        }
+
+        .expand-detail td {
+            padding: 0;
+            border-bottom: 1px solid #2a2f3a;
+        }
+
+        .expand-inner {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.28s ease;
+        }
+
+        .expand-detail.open .expand-inner {
+            max-height: 500px;
+        }
+
+        .expand-box {
+            background: #0d1117;
+            padding: 14px 16px;
+            border-radius: 0;
+            line-height: 1.6;
+        }
+
+        .expandable-row.active td {
+            background: rgba(255,255,255,0.04);
+        }
+
+        .table-preview {
+            max-width: 220px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        @media (max-width: 768px) {
+            .table-preview {
+                max-width: 140px;
+            }
+        }
+
+        .expand-detail td {
+            padding: 16px;
+            border-bottom: 1px solid #2a2f3a;
+        }
+
+        .expand-box {
+            background: #0d1117;
+            padding: 14px;
+            border-radius: 8px;
+            line-height: 1.6;
+        }
+
+        .expand-label {
+            font-size: 12px;
+            color: #8e97a4;
+            margin-top: 10px;
+        }
+
+        .expand-title {
+            font-size: 13px;
+            color: #aab2bf;
+            margin-bottom: 4px;
+        }
+
+        .table-preview {
+            max-width: 220px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        @media (max-width: 768px) {
+            .table-preview {
+                max-width: 140px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <h2 class="page-title">Dashboard Insight Tanya Pak Dahlan</h2>
+
+    <div class="cards">
+        <div class="card">
+            <div class="metric-title">Total User Aktif</div>
+            <div class="metric-value">{{ total_users }}</div>
+            <div class="metric-sub">User aktif yang diizinkan login</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">Total Pertanyaan</div>
+            <div class="metric-value">{{ total_questions }}</div>
+            <div class="metric-sub">Seluruh pertanyaan yang masuk</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">User Unik Pernah Chat</div>
+            <div class="metric-value">{{ total_unique_chat_users }}</div>
+            <div class="metric-sub">Berdasarkan nomor user di log chat</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">Total Session</div>
+            <div class="metric-value">{{ total_sessions }}</div>
+            <div class="metric-sub">Total sesi login yang tercatat</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">Rata-rata Response</div>
+            <div class="metric-value">{{ avg_response }} ms</div>
+            <div class="metric-sub">Kecepatan jawaban sistem</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">Rata-rata Chat per User</div>
+            <div class="metric-value">{{ avg_questions_per_user }}</div>
+            <div class="metric-sub">Kedalaman interaksi user</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">Rata-rata Panjang Pertanyaan</div>
+            <div class="metric-value">{{ avg_question_length }}</div>
+            <div class="metric-sub">Karakter per pertanyaan</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">Rata-rata Panjang Jawaban</div>
+            <div class="metric-value">{{ avg_answer_length }}</div>
+            <div class="metric-sub">Karakter per jawaban</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">Rata-rata Durasi Session</div>
+            <div class="metric-value">{{ avg_session_duration }} dtk</div>
+            <div class="metric-sub">Durasi rata-rata sesi penggunaan</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">Total Good Answer</div>
+            <div class="metric-value good">{{ total_good }}</div>
+            <div class="metric-sub">Jawaban normal / sehat</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">Total Short Answer</div>
+            <div class="metric-value warn">{{ total_short }}</div>
+            <div class="metric-sub">Jawaban terlalu pendek</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">Total Weak Answer</div>
+            <div class="metric-value warn">{{ total_weak }}</div>
+            <div class="metric-sub">Jawaban ada, tetapi lemah</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">Total Fallback</div>
+            <div class="metric-value bad">{{ total_fallback }}</div>
+            <div class="metric-sub">Jawaban gagal / fallback</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">Total Feedback</div>
+            <div class="metric-value">{{ total_questions }}</div>
+            <div class="metric-sub">Masukan user yang masuk ke sistem</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">User Satisfaction</div>
+            <div class="metric-value info">{{ satisfaction }}%</div>
+            <div class="metric-sub">Skor kepuasan berdasarkan kualitas jawaban AI</div>
+        </div>
+
+    </div>
+
+    <div class="section-title">Aktivitas</div>
+
+    <div class="grid-2">
+        <div class="card">
+            <h3>Pertanyaan per Hari</h3>
+            <div class="chart-wrap">
+                <canvas id="chartDay"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Session per Hari</h3>
+            <div class="chart-wrap">
+                <canvas id="chartSessionDay"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="card">
+            <h3>Jam Aktif User</h3>
+            <div class="chart-wrap">
+                <canvas id="chartHour"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Kategori Pertanyaan</h3>
+            <div class="chart-wrap">
+                <canvas id="chartCategory"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title">Mood User</div>
+
+    <div class="grid-2">
+        <div class="card">
+            <h3>Distribusi Mood User</h3>
+            <div class="chart-wrap">
+                <canvas id="chartMood"></canvas>
+            </div>
+        </div>
+
+        <div class="card list-wrap">
+            <h3>Interpretasi</h3>
+            <p class="small">
+                Ini adalah indikator mood user berdasarkan pola pertanyaan.
+                Nilainya bukan emosi absolut, tetapi cukup membantu membaca arah pengalaman user:
+                positif, netral, atau negatif.
+            </p>
+        </div>
+    </div>
+
+    <div class="section-title">Perilaku User</div>
+
+    <div class="grid-2">
+        <div class="card list-wrap">
+            <h3>Top Pertanyaan</h3>
+            {% if top_questions %}
+                <ul>
+                    {% for q in top_questions %}
+                        <li>
+                            {{ q.user_query }}
+                            <span class="small">({{ q.total }})</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="small">Belum ada data.</p>
+            {% endif %}
+        </div>
+
+        <div class="card list-wrap">
+            <h3>User Paling Aktif</h3>
+            {% if top_users %}
+                <ul>
+                    {% for u in top_users %}
+                        <li>
+                            {{ u.user_name }}
+                            <span class="small">({{ u.total }})</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="small">Belum ada data.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="section-title">Monitoring Kualitas</div>
+
+    <div class="grid-2">
+        <div class="card table-card">
+            <h3>10 Pertanyaan Terpanjang</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>User</th>
+                        <th>Pertanyaan</th>
+                        <th>Panjang</th>
+                        <th>Waktu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if longest_questions %}
+                        {% for row in longest_questions %}
+                        <tr class="expandable-row" onclick="toggleRow(this, 'detail-long-{{ loop.index }}')">
+                            <td>{{ loop.index }}</td>
+                            <td>{{ row.user_name }}</td>
+                            <td class="table-preview" title="{{ row.user_query }}">
+                                {{ row.user_query }}
+                            </td>
+                            <td>{{ row.question_length }}</td>
+                            <td>{{ row.created_at }}</td>
+                        </tr>
+
+                        <tr id="detail-long-{{ loop.index }}" class="expand-detail">
+                            <td colspan="5">
+                                <div class="expand-inner">
+                                    <div class="expand-box">
+                                        <div class="expand-title">Pertanyaan:</div>
+                                        {{ row.user_query }}
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr><td colspan="5" class="small">Belum ada data.</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card table-card">
+            <h3>10 Jawaban Terpendek</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Pertanyaan</th>
+                        <th>Panjang Jawaban</th>
+                        <th>Jawaban</th>
+                        <th>Waktu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for row in shortest_answers %}
+                <tr class="expandable-row" onclick="toggleRow(this, 'detail-short-{{ loop.index }}')">
+                    <td>{{ loop.index }}</td>
+                    <td>{{ row.user_name }}</td>
+                    <td class="table-preview" title="{{ row.user_query }}">
+                        {{ row.user_query }}
+                    </td>
+                    <td>{{ row.answer_length }}</td>
+                    <td>{{ row.created_at }}</td>
+                </tr>
+
+                <tr id="detail-short-{{ loop.index }}" class="expand-detail">
+                    <td colspan="5">
+                        <div class="expand-inner">
+                            <div class="expand-box">
+                                <div class="expand-title">Pertanyaan:</div>
+                                {{ row.user_query }}
+
+                                <div class="expand-label">Jawaban:</div>
+                                {{ row.ai_response }}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section-title">Quality Scoring AI</div>
+
+    <div class="grid-2">
+        <div class="card">
+            <h3>Distribusi Kualitas Jawaban</h3>
+            <div class="chart-wrap">
+                <canvas id="chartQuality"></canvas>
+            </div>
+        </div>
+
+        <div class="card list-wrap">
+            <h3>Fallback per Kategori</h3>
+            {% if fallback_by_category %}
+                <ul>
+                    {% for row in fallback_by_category %}
+                        <li>
+                            {{ row.intent_category }}
+                            <span class="small">({{ row.total }})</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="small">Belum ada fallback.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="card">
+            <h3>User Satisfaction</h3>
+            <div class="chart-wrap">
+                <canvas id="chartSatisfaction"></canvas>
+            </div>
+        </div>
+
+        <div class="card list-wrap">
+            <h3>Penjelasan Skor</h3>
+            <p class="small">
+                Skor dihitung dari kualitas jawaban AI.
+                Good memiliki bobot tertinggi, diikuti short dan weak.
+                Fallback bernilai 0.
+            </p>
+        </div>
+    </div>
+
+    <div class="section-title">Root Cause Analysis</div>
+
+    <div class="grid-2">
+        <div class="card">
+            <h3>Distribusi Penyebab</h3>
+            <div class="chart-wrap">
+                <canvas id="chartRootCause"></canvas>
+            </div>
+        </div>
+
+        <div class="card list-wrap">
+            <h3>Top Penyebab Gagal</h3>
+            {% if top_failure_reasons %}
+                <ul>
+                    {% for row in top_failure_reasons %}
+                        <li>
+                            {{ row.failure_reason }}
+                            <span class="small">({{ row.total }})</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="small">Belum ada data penyebab gagal.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="card table-card">
+            <h3>10 Kasus Gagal / Lemah Terbaru</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Pertanyaan</th>
+                        <th>Kualitas</th>
+                        <th>Label Penyebab</th>
+                        <th>Alasan</th>
+                        <th>Waktu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for row in root_cause_logs %}
+                <tr class="expandable-row" onclick="toggleRow(this, 'detail-root-{{ loop.index }}')">
+                    <td>{{ loop.index }}</td>
+                    <td>{{ row.user_name }}</td>
+                    <td class="table-preview" title="{{ row.user_query }}">
+                        {{ row.user_query }}
+                    </td>
+                    <td>{{ row.answer_quality }}</td>
+                    <td>{{ row.created_at }}</td>
+                </tr>
+
+                <tr id="detail-root-{{ loop.index }}" class="expand-detail">
+                    <td colspan="5">
+                        <div class="expand-box">
+                            <div class="expand-title">Pertanyaan:</div>
+                            {{ row.user_query }}
+
+                            <div class="expand-label">Jawaban:</div>
+                            {{ row.ai_response }}
+
+                            <div class="expand-label">Root Cause:</div>
+                            {{ row.failure_reason }}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card table-card">
+            <h3>10 Fallback Terbaru</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Pertanyaan</th>
+                        <th>Jawaban</th>
+                        <th>Catatan</th>
+                        <th>Waktu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for row in fallback_logs %}
+                <tr class="expandable-row" onclick="toggleRow(this, 'detail-fallback-{{ loop.index }}')">
+                    <td>{{ loop.index }}</td>
+                    <td>{{ row.user_name }}</td>
+                    <td class="table-preview" title="{{ row.user_query }}">
+                        {{ row.user_query }}
+                    </td>
+                    <td>{{ row.created_at }}</td>
+                </tr>
+
+                <tr id="detail-fallback-{{ loop.index }}" class="expand-detail">
+                    <td colspan="4">
+                        <div class="expand-box">
+                            <div class="expand-title">Pertanyaan:</div>
+                            {{ row.user_query }}
+
+                            <div class="expand-label">Jawaban:</div>
+                            {{ row.ai_response }}
+
+                            <div class="expand-label">Catatan:</div>
+                            {{ row.quality_note }}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card table-card">
+        <h3>10 Response Paling Lambat</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Pertanyaan</th>
+                    <th>Response</th>
+                    <th>Waktu</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in slowest_responses %}
+            <tr class="expandable-row" onclick="toggleRow(this, 'detail-slow-{{ loop.index }}')">
+                <td>{{ loop.index }}</td>
+                <td>{{ row.user_name }}</td>
+                <td class="table-preview" title="{{ row.user_query }}">
+                    {{ row.user_query }}
+                </td>
+                <td>{{ row.response_time_ms }} ms</td>
+                <td>{{ row.created_at }}</td>
+            </tr>
+
+            <tr id="detail-slow-{{ loop.index }}" class="expand-detail">
+                <td colspan="5">
+                    <div class="expand-inner">
+                        <div class="expand-box">
+                            <div class="expand-title">Pertanyaan:</div>
+                            {{ row.user_query }}
+
+                            <div class="expand-label">Jawaban:</div>
+                            {{ row.ai_response }}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section-title">Masukan User</div>
+
+    <div class="grid-2">
+        <div class="card">
+            <h3>Distribusi Jenis Masukan</h3>
+            <div class="chart-wrap">
+                <canvas id="chartFeedbackType"></canvas>
+            </div>
+        </div>
+
+        <div class="card list-wrap">
+            <h3>Ringkasan</h3>
+            <p class="small">
+                Masukan user dari tombol “Kirim Masukan” masuk ke insight dan dikelompokkan
+                menjadi saran, bug, jawaban, UI/UX, atau umum.
+            </p>
+        </div>
+    </div>
+
+    <div class="card table-card">
+        <h3>10 Masukan Terbaru</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Tipe</th>
+                    <th>Masukan</th>
+                    <th>Pertanyaan Terkait</th>
+                    <th>Waktu</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if latest_feedback %}
+                    {% for row in latest_feedback %}
+                    <tr>
+                        <td>{{ row.user_name }}</td>
+                        <td>{{ row.feedback_type }}</td>
+                        <td class="snippet">{{ row.message }}</td>
+                        <td class="snippet">{{ row.related_question }}</td>
+                        <td>{{ row.created_at }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td colspan="5" class="small">Belum ada masukan user.</td></tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- JSON aman -->
+    <script id="day-labels" type="application/json">{{ per_day | map(attribute='day') | list | tojson }}</script>
+    <script id="day-data" type="application/json">{{ per_day | map(attribute='total') | list | tojson }}</script>
+
+    <script id="hour-labels" type="application/json">{{ per_hour | map(attribute='hour') | list | tojson }}</script>
+    <script id="hour-data" type="application/json">{{ per_hour | map(attribute='total') | list | tojson }}</script>
+
+    <script id="session-day-labels" type="application/json">{{ sessions_per_day | map(attribute='day') | list | tojson }}</script>
+    <script id="session-day-data" type="application/json">{{ sessions_per_day | map(attribute='total') | list | tojson }}</script>
+
+    <script id="category-labels" type="application/json">{{ category_data | map(attribute='intent_category') | list | tojson }}</script>
+    <script id="category-data" type="application/json">{{ category_data | map(attribute='total') | list | tojson }}</script>
+
+    <script id="quality-labels" type="application/json">{{ quality_data | map(attribute='answer_quality') | list | tojson }}</script>
+    <script id="quality-data" type="application/json">{{ quality_data | map(attribute='total') | list | tojson }}</script>
+
+    <script id="root-cause-labels" type="application/json">{{ root_cause_data | map(attribute='root_cause_label') | list | tojson }}</script>
+    <script id="root-cause-data" type="application/json">{{ root_cause_data | map(attribute='total') | list | tojson }}</script>
+
+    <script id="feedback-type-labels" type="application/json">{{ feedback_by_type | map(attribute='feedback_type') | list | tojson }}</script>
+    <script id="feedback-type-data" type="application/json">{{ feedback_by_type | map(attribute='total') | list | tojson }}</script>
+
+    <script id="mood-labels" type="application/json">
+    {{ mood_data | map(attribute='mood') | list | tojson }}
+    </script>
+
+    <script id="mood-data" type="application/json">
+        {{ mood_data | map(attribute='total') | list | tojson }}
+    </script>
+
+    <script id="satisfaction-value" type="application/json">
+        {{ satisfaction | tojson }}
+    </script>
+
+    <script>
+        function readJsonScript(id) {
+            const el = document.getElementById(id);
+            if (!el) return [];
+            try {
+                return JSON.parse(el.textContent);
+            } catch (err) {
+                console.error("Gagal parse JSON dari", id, err);
+                return [];
+            }
+        }
+
+        const dayLabels = readJsonScript("day-labels");
+        const dayData = readJsonScript("day-data");
+
+        const hourLabels = readJsonScript("hour-labels");
+        const hourData = readJsonScript("hour-data");
+
+        const sessionDayLabels = readJsonScript("session-day-labels");
+        const sessionDayData = readJsonScript("session-day-data");
+
+        const categoryLabels = readJsonScript("category-labels");
+        const categoryData = readJsonScript("category-data");
+
+        const qualityLabels = readJsonScript("quality-labels");
+        const qualityData = readJsonScript("quality-data");
+
+        const rootCauseLabels = readJsonScript("root-cause-labels");
+        const rootCauseData = readJsonScript("root-cause-data");
+
+        const feedbackTypeLabels = readJsonScript("feedback-type-labels");
+        const feedbackTypeData = readJsonScript("feedback-type-data");
+        const moodLabels = readJsonScript("mood-labels");
+        const moodData = readJsonScript("mood-data");
+        const satisfactionValue = readJsonScript("satisfaction-value");
+
+        const centerTextPlugin = {
+            id: "centerTextPlugin",
+            beforeDraw(chart, args, pluginOptions) {
+                if (chart.config.type !== "doughnut") return;
+
+                const { ctx, chartArea } = chart;
+                if (!chartArea) return;
+
+                const data = chart.data.datasets[0].data || [];
+                const total = data.reduce((sum, val) => sum + Number(val || 0), 0);
+
+                const x = (chartArea.left + chartArea.right) / 2;
+                const y = (chartArea.top + chartArea.bottom) / 2;
+
+                ctx.save();
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 26px Arial";
+                ctx.fillText(total, x, y - 8);
+
+                ctx.fillStyle = "#8e97a4";
+                ctx.font = "12px Arial";
+                ctx.fillText("total", x, y + 16);
+
+                ctx.restore();
+            }
+        };
+
+
+        new Chart(document.getElementById("chartDay"), {
+            type: "line",
+            data: {
+                labels: dayLabels,
+                datasets: [{
+                    label: "Pertanyaan",
+                    data: dayData,
+                    tension: 0.25,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        new Chart(document.getElementById("chartSessionDay"), {
+            type: "line",
+            data: {
+                labels: sessionDayLabels,
+                datasets: [{
+                    label: "Session",
+                    data: sessionDayData,
+                    tension: 0.25,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        new Chart(document.getElementById("chartHour"), {
+            type: "bar",
+            data: {
+                labels: hourLabels,
+                datasets: [{
+                    label: "Aktivitas",
+                    data: hourData,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        new Chart(document.getElementById("chartCategory"), {
+            type: "pie",
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    data: categoryData,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        new Chart(document.getElementById("chartQuality"), {
+            type: "doughnut",
+            data: {
+                labels: qualityLabels,
+                datasets: [{
+                    data: qualityData,
+                    backgroundColor: [
+                        "#63d2b0",
+                        "#f6c177",
+                        "#ef6b73",
+                        "#6ea8fe",
+                        "#b197fc"
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: "68%",
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: "#cfd6e4"
+                        }
+                    }
+                }
+            },
+            plugins: [centerTextPlugin]
+        });
+
+        new Chart(document.getElementById("chartRootCause"), {
+            type: "bar",
+            data: {
+                labels: rootCauseLabels,
+                datasets: [{
+                    label: "Jumlah Kasus",
+                    data: rootCauseData,
+                    backgroundColor: [
+                        "#6ea8fe",
+                        "#63d2b0",
+                        "#f6c177",
+                        "#ef6b73",
+                        "#b197fc"
+                    ],
+                    borderWidth: 0,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: "#cfd6e4"
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: "#aab2bf" },
+                        grid: { color: "rgba(255,255,255,0.05)" }
+                    },
+                    y: {
+                        ticks: { color: "#aab2bf" },
+                        grid: { color: "rgba(255,255,255,0.05)" }
+                    }
+                }
+            }
+        });
+
+        new Chart(document.getElementById("chartFeedbackType"), {
+                    type: "doughnut",
+                    data: {
+                        labels: feedbackTypeLabels,
+                        datasets: [{
+                            data: feedbackTypeData,
+                            backgroundColor: [
+                                "#6ea8fe",
+                                "#63d2b0",
+                                "#f6c177",
+                                "#ef6b73",
+                                "#b197fc"
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: "62%",
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: "#cfd6e4"
+                                }
+                            }
+                        }
+                    },
+                    plugins: [centerTextPlugin]
+                });
+
+                new Chart(document.getElementById("chartSatisfaction"), {
+            type: "doughnut",
+            data: {
+                labels: ["Satisfied", "Remaining"],
+                datasets: [{
+                    data: [satisfactionValue, 100 - satisfactionValue],
+                    backgroundColor: [
+                        "#63d2b0",
+                        "rgba(255,255,255,0.06)"
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: "72%",
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: "#cfd6e4"
+                        }
+                    }
+                }
+            },
+            plugins: [{
+                id: "centerSatisfactionText",
+                beforeDraw(chart) {
+                    const { ctx, chartArea } = chart;
+                    if (!chartArea) return;
+
+                    const x = (chartArea.left + chartArea.right) / 2;
+                    const y = (chartArea.top + chartArea.bottom) / 2;
+
+                    ctx.save();
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+
+                    ctx.fillStyle = "#ffffff";
+                    ctx.font = "bold 24px Arial";
+                    ctx.fillText(satisfactionValue + "%", x, y - 8);
+
+                    ctx.fillStyle = "#8e97a4";
+                    ctx.font = "12px Arial";
+                    ctx.fillText("satisfaction", x, y + 16);
+
+                    ctx.restore();
+                }
+            }]
+        });
+
+        new Chart(document.getElementById("chartMood"), {
+            type: "doughnut",
+            data: {
+                labels: moodLabels,
+                datasets: [{
+                    data: moodData,
+                    backgroundColor: [
+                        "#63d2b0",   // Positif
+                        "#6ea8fe",   // Netral
+                        "#ef6b73"    // Negatif
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: "68%",
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: "#cfd6e4"
+                        }
+                    }
+                }
+            },
+            plugins: [centerTextPlugin]
+        });
+
+    </script>
+
+<script>
+
+function toggleRow(clickedRow, id) {
+    const target = document.getElementById(id);
+    if (!target) return;
+
+    const isOpen = target.classList.contains("open");
+
+    document.querySelectorAll(".expand-detail").forEach(row => {
+        row.style.display = "none";
+        row.classList.remove("open");
+    });
+
+    document.querySelectorAll(".expandable-row").forEach(row => {
+        row.classList.remove("active");
+    });
+
+    if (!isOpen) {
+        target.style.display = "table-row";
+        requestAnimationFrame(() => {
+            target.classList.add("open");
+        });
+        clickedRow.classList.add("active");
+    }
+}
+
+</script>
+
+
+</body>
+</html>

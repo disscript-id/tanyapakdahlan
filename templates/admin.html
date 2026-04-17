@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Tanya Pak Dahlan</title>
+    <style>
+        :root {
+            --bg: #0d1017;
+            --card: rgba(255,255,255,0.05);
+            --border: rgba(255,255,255,0.08);
+            --text: #edf1f7;
+            --muted: #a6b0bf;
+            --accent: #8ab4f8;
+            --success: #dbeaff;
+            --danger-bg: rgba(255, 120, 120, 0.16);
+            --danger-border: rgba(255, 120, 120, 0.24);
+            --danger-text: #ffe6e6;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 24px;
+        }
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .sub {
+            font-size: 14px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+        .pill {
+            background: rgba(138,180,248,0.12);
+            color: var(--success);
+            border: 1px solid rgba(138,180,248,0.20);
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 14px;
+        }
+        .btn-logout {
+            text-decoration: none;
+            color: white;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.06);
+            padding: 10px 14px;
+            border-radius: 12px;
+        }
+        .section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 18px;
+            backdrop-filter: blur(6px);
+        }
+        .section h2 {
+            margin: 0 0 14px;
+            font-size: 20px;
+        }
+        .notice {
+            background: rgba(255, 120, 120, 0.12);
+            border: 1px solid rgba(255, 120, 120, 0.18);
+            color: #ffe5e5;
+            padding: 12px 14px;
+            border-radius: 14px;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+        .actions-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+        .quick-btn {
+            display: inline-block;
+            text-decoration: none;
+            color: white;
+            background: rgba(147, 96, 0, 0.96);
+            border: 1px solid rgba(169, 96, 0, 0.707);
+            padding: 11px 14px;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            vertical-align: top;
+        }
+        th {
+            color: var(--muted);
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-block;
+            text-decoration: none;
+            color: white;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background: rgba(138,180,248,0.18);
+            border-color: rgba(138,180,248,0.22);
+        }
+        .btn-danger {
+            background: var(--danger-bg);
+            border-color: var(--danger-border);
+            color: var(--danger-text);
+        }
+        .inline-form {
+            margin: 0;
+        }
+        .empty {
+            color: var(--muted);
+            padding: 10px 4px;
+            line-height: 1.6;
+        }
+        @media (max-width: 860px) {
+            body { padding: 16px; }
+            table, thead, tbody, th, td, tr { display: block; }
+            thead { display: none; }
+            tr {
+                border: 1px solid rgba(255,255,255,0.06);
+                border-radius: 14px;
+                padding: 10px;
+                margin-bottom: 10px;
+            }
+            td {
+                border: none;
+                padding: 6px 2px;
+            }
+            td::before {
+                content: attr(data-label);
+                display: block;
+                font-size: 12px;
+                color: var(--muted);
+                margin-bottom: 3px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div>
+            <div class="title">Admin Tanya Pak Dahlan</div>
+            <div class="sub">Kelola request akses, approve peserta, reset PIN, dan buka halaman insight.</div>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <div class="pill">Peserta aktif: {{ active_user_count }} / {{ max_active_users }}</div>
+            <a class="btn-logout" href="/admin/logout">Logout Admin</a>
+        </div>
+    </div>
+
+    {% if admin_error %}
+    <div class="notice">{{ admin_error }}</div>
+    {% endif %}
+
+    <div class="actions-row">
+        {% if insight_unlocked %}
+            <a class="quick-btn" href="/admin/insight">Buka Dashboard Insight</a>
+        {% else %}
+            <a class="quick-btn" href="/admin/insight-login">Masuk ke Insight</a>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <h2>Request Akses Masuk</h2>
+        {% if requests %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>No WA</th>
+                    <th>Keterangan</th>
+                    <th>Tanggal</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in requests %}
+                <tr>
+                    <td data-label="Nama">{{ r.name }}</td>
+                    <td data-label="No WA">{{ r.phone }}</td>
+                    <td data-label="Keterangan">{{ r.note or '-' }}</td>
+                    <td data-label="Tanggal">{{ r.created_at }}</td>
+                    <td data-label="Aksi">
+                        <div class="actions">
+                            <a class="btn btn-primary" href="/admin/approve/{{ r.id }}">Setujui &amp; Generate PIN</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty">Belum ada request akses yang pending.</div>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <h2>Peserta Aktif</h2>
+        {% if active_users %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>No WA</th>
+                    <th>Catatan</th>
+                    <th>Terdaftar</th>
+                    <th>Login Terakhir</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in active_users %}
+                <tr>
+                    <td data-label="Nama">{{ u.name or '-' }}</td>
+                    <td data-label="No WA">{{ u.phone }}</td>
+                    <td data-label="Catatan">{{ u.note or '-' }}</td>
+                    <td data-label="Terdaftar">{{ u.created_at }}</td>
+                    <td data-label="Login Terakhir">{{ u.last_login_at or '-' }}</td>
+                    <td data-label="Aksi">
+                        <div class="actions">
+                            <a class="btn" href="/admin/reset/{{ u.phone }}">Reset PIN</a>
+
+                            <form class="inline-form" method="POST" action="/admin/deactivate/{{ u.id }}" onsubmit="return confirm('Nonaktifkan user ini? User tidak akan bisa login lagi.');">
+                                <button type="submit" class="btn btn-danger">Nonaktifkan</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty">Belum ada peserta aktif.</div>
+        {% endif %}
+    </div>
+</body>
+</html>

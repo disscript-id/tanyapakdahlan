@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tanya Pak Dahlan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#101114">
+
+    <style>
+        :root {
+            --bg-color: #101114;
+            --text-main: #edf1f7;
+            --text-soft: #c9d0da;
+            --text-faint: #98a2b3;
+            --input-bg: rgba(255,255,255,0.05);
+            --border-soft: rgba(255,255,255,0.07);
+            --border-faint: rgba(255,255,255,0.05);
+            --avatar-opacity: 0.7;
+            --accent-soft: rgba(138, 180, 248, 0.16);
+            --accent-text: #cfe0ff;
+            --cta-yellow: #ecbd01;
+            --card-bg: rgba(255,255,255,0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Google Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            height: 100dvh;
+            -webkit-tap-highlight-color: transparent;
+            overflow: hidden;
+        }
+
+        #header {
+            position: sticky;
+            top: 0;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            background: rgba(14, 15, 18, 0.82);
+            backdrop-filter: blur(6px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            z-index: 100;
+        }
+
+        .header-logo {
+            height: 28px;
+            opacity: 0.92;
+        }
+
+        .header-right {
+            margin-left: auto;
+            color: white;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .header-right a,
+        .header-link-btn {
+            color: #ffb3b3;
+            text-decoration: none;
+            background: transparent;
+            border: none;
+            font-family: inherit;
+            font-size: 13px;
+            cursor: default;
+            padding: 0;
+            pointer-events: none;
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #d9e7ff;
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: rgba(138, 180, 248, 0.10);
+            border: 1px solid rgba(138, 180, 248, 0.14);
+            white-space: nowrap;
+        }
+
+        #chat {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            overflow-x: hidden;
+            transition: filter 0.3s ease, opacity 0.3s ease;
+        }
+
+        #chat::-webkit-scrollbar {
+            width: 0;
+            background: transparent;
+        }
+
+        #chat {
+            scrollbar-width: none;
+        }
+
+        .message {
+            line-height: 1.7;
+            font-size: 15px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            max-width: 100%;
+        }
+
+        .user {
+            align-self: flex-end;
+            margin-right: 8px;
+            background-color: rgba(255,255,255,0.10);
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 82%;
+            animation: fadeUp 0.22s ease;
+        }
+
+        .pakdahlan {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            animation: fadeUp 0.22s ease;
+        }
+
+        .ai-avatar {
+            width: 26px;
+            height: 26px;
+            min-width: 26px;
+            border-radius: 50%;
+            opacity: var(--avatar-opacity);
+            margin-top: 2px;
+        }
+
+        .welcome-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 0;
+            width: 100%;
+        }
+
+        .welcome-title {
+            font-size: 15px;
+            color: #f2f5fb;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .access-note {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            width: fit-content;
+            font-size: 12px;
+            color: #d9e7ff;
+            background: rgba(3, 9, 20, 0);
+            border: 1px solid rgba(138, 180, 248, 0.14);
+            padding: 7px 12px;
+            border-radius: 999px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        .chip-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 0;
+        }
+
+        .question-chip {
+            width: 100%;
+            background: var(--card-bg);
+            color: #dde4ee;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 18px;
+            padding: 10px 16px;
+            min-height: 58px;
+            font-family: inherit;
+            font-size: 13px;
+            line-height: 1.25;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            text-align: right;
+            transition: transform 0.15s ease, background 0.15s ease, border 0.15s ease;
+        }
+
+        .question-chip:hover {
+            transform: translateY(-1px);
+            background: rgba(255,255,255,0.07);
+            border-color: rgba(255,255,255,0.08);
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .btn-main {
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 22px;
+            padding: 14px 16px 13px;
+            min-height: 88px;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: transform 0.16s ease, opacity 0.16s ease, background 0.16s ease;
+            background: rgba(255,255,255,0.14);
+            color: #eef2f7;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-align: left;
+        }
+
+        .btn-main:hover {
+            transform: translateY(-1px);
+            background: rgba(255,255,255,0.18);
+        }
+
+        .btn-main-copy {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            align-items: flex-start;
+        }
+
+        .btn-main-mini {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #b8c2d3;
+            font-weight: 400;
+            letter-spacing: 0;
+        }
+
+        .btn-main-title {
+            font-size: 17px;
+            line-height: 1.2;
+            color: var(--cta-yellow);
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
+        .btn-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 23px;
+            line-height: 1;
+            min-width: 28px;
+            margin-left: 14px;
+            flex-shrink: 0;
+        }
+
+        .inline-cta {
+            display: none;
+        }
+
+        .inline-cta a {
+            color: #cfe0ff;
+            text-decoration: none;
+        }
+
+        .soft-reply {
+            color: #dce6f6;
+        }
+
+        .soft-reply small {
+            display: block;
+            margin-top: 4px;
+            color: #aeb7c4;
+            font-size: 12px;
+        }
+
+        .thinking-text {
+            color: #aeb6c2;
+            font-style: italic;
+        }
+
+        #inputSection {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 10px 12px;
+            background: rgba(16,17,20,0.88);
+            position: sticky;
+            bottom: 0;
+            transition: filter 0.3s ease, opacity 0.3s ease;
+        }
+
+        #inputContainer {
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 24px;
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: 8px;
+            padding: 6px 12px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+
+        #question {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 16px;
+            padding: 8px;
+            outline: none;
+            resize: none;
+            max-height: 120px;
+            font-family: inherit;
+        }
+
+        #question::placeholder {
+            color: rgba(255,255,255,0.42);
+        }
+
+        #askBtn {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.88);
+            cursor: pointer;
+            padding: 6px;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+        }
+
+        #askBtn:hover {
+            transform: translateY(-1px);
+            opacity: 0.95;
+        }
+
+        #askBtn:disabled {
+            opacity: 0.5;
+            cursor: default;
+            transform: none;
+        }
+
+        #askBtn svg path {
+            fill: currentColor;
+        }
+
+        #askBtn svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .desc {
+            text-align: center;
+            font-size: 10px;
+            margin-top: 12px;
+            color: #808792;
+            margin-bottom: 2px;
+        }
+
+        .feedback {
+            display: none;
+        }
+
+        #footer {
+            padding: 12px 10px;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            background: rgba(16,17,20,0.9);
+        }
+
+        .collab-text {
+            font-size: 10px;
+            color: #7f8792;
+            margin-bottom: 7px;
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .logo-img {
+            height: 18px;
+            opacity: 0.8;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-actions {
+                flex-direction: column;
+            }
+
+            .question-chip {
+                padding: 8px 14px;
+                min-height: 50px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #header {
+                padding: 11px 12px;
+            }
+
+            .header-right {
+                gap: 10px;
+                font-size: 12px;
+            }
+
+            .header-badge {
+                font-size: 10px;
+                padding: 5px 9px;
+                max-width: 170px;
+                white-space: normal;
+                line-height: 1.2;
+                text-align: center;
+                justify-content: center;
+            }
+
+            #chat {
+                padding: 12px;
+            }
+
+            .user {
+                max-width: 90%;
+            }
+
+            .question-chip {
+                width: 100%;
+                border-radius: 16px;
+                padding: 3px 14px;
+                min-height: unset;
+                font-size: 12px;
+                line-height: 1.1;
+                text-align: right;
+                justify-content: flex-end;
+            }
+
+            .welcome-title {
+                font-size: 14px;
+            }
+
+            .access-note {
+                margin-top: 28px;
+                margin-bottom: 16px;
+                margin-left: auto;
+            }
+
+            .btn-main {
+                border-radius: 18px;
+                padding: 12px 14px;
+                min-height: 74px;
+            }
+
+            .btn-main-copy {
+                gap: 1px;
+            }
+
+            .btn-main-mini {
+                font-size: 11px;
+            }
+
+            .btn-main-title {
+                font-size: 15px;
+            }
+
+            .btn-icon {
+                font-size: 22px;
+                margin-left: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="desktopBlockNotice" style="display:none; padding:14px 16px; text-align:center; background:rgba(255,99,99,0.12); color:#ffe2e2; font-size:13px; line-height:1.6; border-bottom:1px solid rgba(255,120,120,0.18);">
+        Fitur peserta hanya bisa dibuka melalui HP.
+    </div>
+
+    <div id="header">
+        <img class="header-logo" src="/static/icon_tanya_pak_dahlan.png" alt="Logo">
+        <div class="header-right">
+            <span class="header-badge">Ajukan akses untuk bisa:</span>
+            <a href="#" onclick="event.preventDefault()">Login</a>
+        </div>
+    </div>
+
+    <div id="chat">
+        <div class="message pakdahlan">
+            <img class="ai-avatar" src="/static/icon_tanya_dis.png" alt="Avatar">
+            <div class="welcome-wrap">
+                <div class="welcome-title">Hallo ! Saya Dahlan Iskan . . .</div>
+
+                <div class="access-note">✨ Uji coba terbatas · · ·</div>
+
+                <div class="chip-wrap">
+                    <button class="question-chip" type="button" onclick="useChip('Pak Dahlan, bagaimana melihat kondisi ekonomi hari ini?')">
+                        Pak Dahlan, bagaimana melihat kondisi ekonomi hari ini?
+                    </button>
+
+                    <button class="question-chip" type="button" onclick="useChip('Apa pandangan Pak Dahlan soal pendidikan?')">
+                        Apa pandangan Pak Dahlan soal pendidikan?
+                    </button>
+
+                    <button class="question-chip" type="button" onclick="useChip('Bagaimana menyikapi perubahan zaman?')">
+                        Bagaimana menyikapi perubahan zaman?
+                    </button>
+                </div>
+
+                <div class="top-actions">
+                    <button class="btn-main" type="button" onclick="goAccessPage()">
+                        <div class="btn-main-copy">
+                            <span class="btn-main-mini">coba Tanya Pak Dahlan</span>
+                            <span class="btn-main-title">AJUKAN AKSES      -      LOGIN</span>
+                        </div>
+                        <span class="btn-icon">👤</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="inputSection">
+        <div id="inputContainer">
+            <textarea id="question" rows="1" placeholder="Tanya Pak Dahlan..." oninput="this.style.height='';this.style.height=this.scrollHeight + 'px'"></textarea>
+            <button id="askBtn" onclick="teaserAsk()">
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+            </button>
+        </div>
+        <div class="desc">
+            Tanya Pak Dahlan adalah fitur AI. Namanya juga mesin, kadang bisa keliru.
+        </div>
+    </div>
+
+    <div id="footer">
+        <div class="collab-text">DIS Script Technology kolaborasi dengan SMKN 2 Kota Mojokerto</div>
+        <div class="logo-container">
+            <img class="logo-img" src="/static/logodisscriptputih.png" alt="DIS Script">
+            <img class="logo-img" src="/static/logo_smk_putih.png" alt="SMKN 2">
+            <img class="logo-img" src="/static/logo_disway_putih.png" alt="DISWAY">
+        </div>
+    </div>
+
+    <script>
+        function isMobileBrowser() {
+            const ua = (navigator.userAgent || "").toLowerCase();
+            return /android|iphone|ipod|mobile|blackberry|windows phone|opera mini|iemobile/.test(ua);
+        }
+
+        const ACCESS_PAGE_URL = "/akses";
+        const REDIRECT_DELAY = 1600;
+        let isSubmittingFake = false;
+
+        function goAccessPage() {
+            if (!isMobileBrowser()) {
+                const notice = document.getElementById("desktopBlockNotice");
+                if (notice) notice.style.display = "block";
+                return;
+            }
+            window.location.href = ACCESS_PAGE_URL;
+        }
+
+        function appendUserMessage(text) {
+            const chat = document.getElementById("chat");
+            const userDiv = document.createElement("div");
+            userDiv.className = "message user";
+            userDiv.innerText = text;
+            chat.appendChild(userDiv);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function appendThinkingMessage() {
+            const chat = document.getElementById("chat");
+            const thinkingDiv = document.createElement("div");
+            thinkingDiv.className = "message pakdahlan";
+            thinkingDiv.id = "fakeThinkingMessage";
+            thinkingDiv.innerHTML = `
+                <img class="ai-avatar" src="/static/icon_tanya_dis.png" alt="Avatar">
+                <div class="thinking-text">Sebentar, saya siapkan percakapannya...</div>
+            `;
+            chat.appendChild(thinkingDiv);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function replaceWithSoftReply() {
+            const chat = document.getElementById("chat");
+            const thinkingDiv = document.getElementById("fakeThinkingMessage");
+            if (thinkingDiv && thinkingDiv.parentNode) {
+                thinkingDiv.parentNode.removeChild(thinkingDiv);
+            }
+
+            const replyDiv = document.createElement("div");
+            replyDiv.className = "message pakdahlan";
+            replyDiv.innerHTML = `
+                <img class="ai-avatar" src="/static/icon_tanya_dis.png" alt="Avatar">
+                <div class="soft-reply">
+                    Untuk melanjutkan percakapan, silakan ajukan akses terlebih dahulu.
+                    <small>Anda akan diarahkan ke halaman akses dalam beberapa saat...</small>
+                </div>
+            `;
+            chat.appendChild(replyDiv);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function resetInput() {
+            const questionEl = document.getElementById("question");
+            questionEl.value = "";
+            questionEl.style.height = "auto";
+        }
+
+        function setSubmittingState(state) {
+            const askBtn = document.getElementById("askBtn");
+            const questionEl = document.getElementById("question");
+
+            isSubmittingFake = state;
+            askBtn.disabled = state;
+            questionEl.disabled = state;
+        }
+
+        function teaserAsk(prefilledText = null) {
+            if (isSubmittingFake) return;
+
+            const questionEl = document.getElementById("question");
+            const q = (prefilledText || questionEl.value || "").trim();
+            if (!q) return;
+
+            appendUserMessage(q);
+            resetInput();
+            setSubmittingState(true);
+            appendThinkingMessage();
+
+            setTimeout(() => {
+                replaceWithSoftReply();
+            }, 550);
+
+            setTimeout(() => {
+                goAccessPage();
+            }, REDIRECT_DELAY);
+        }
+
+        function useChip(text) {
+            const questionEl = document.getElementById("question");
+            questionEl.value = text;
+            questionEl.style.height = "";
+            questionEl.style.height = questionEl.scrollHeight + "px";
+            questionEl.focus();
+        }
+
+        const questionBox = document.getElementById("question");
+        if (questionBox) {
+            questionBox.addEventListener("keypress", function(e) {
+                if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    teaserAsk();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

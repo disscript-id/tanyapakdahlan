@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Admin</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(180deg, #0d1017, #111827);
+            color: white;
+            padding: 20px;
+        }
+        .card {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 22px;
+            padding: 28px 22px 22px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+            backdrop-filter: blur(8px);
+        }
+        h1 {
+            margin: 0 0 8px;
+            font-size: 28px;
+        }
+        p {
+            margin: 0 0 18px;
+            color: #aab4c2;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+        .error {
+            background: rgba(255, 120, 120, 0.12);
+            border: 1px solid rgba(255, 120, 120, 0.18);
+            color: #ffe5e5;
+            padding: 12px 14px;
+            border-radius: 14px;
+            margin-bottom: 14px;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #d7dfeb;
+        }
+        input {
+            width: 100%;
+            padding: 14px 15px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(0,0,0,0.35);
+            color: white;
+            font-size: 15px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            border: none;
+            border-radius: 16px;
+            padding: 14px 16px;
+            margin-top: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            background: rgba(255,255,255,0.92);
+            color: #16181c;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Login Admin</h1>
+        <p>Masukkan password admin untuk membuka panel pengelolaan peserta.</p>
+
+        {% if admin_error %}
+        <div class="error">{{ admin_error }}</div>
+        {% endif %}
+
+        <form method="POST" action="/admin/login">
+            <label for="password">Password Admin</label>
+            <input type="password" id="password" name="password" placeholder="Masukkan password admin" required>
+            <button type="submit">Masuk</button>
+        </form>
+    </div>
+</body>
+</html>

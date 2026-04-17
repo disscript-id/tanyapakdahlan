@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tanya Pak Dahlan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#101114">
+
+    <style>
+        :root {
+            --bg-color: #101114;
+            --text-main: #edf1f7;
+            --text-soft: #c9d0da;
+            --text-faint: #98a2b3;
+            --input-bg: rgba(255,255,255,0.05);
+            --border-soft: rgba(255,255,255,0.07);
+            --border-faint: rgba(255,255,255,0.05);
+            --avatar-opacity: 0.7;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Google Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            height: 100dvh;
+            -webkit-tap-highlight-color: transparent;
+            overflow: hidden;
+        }
+
+        #header {
+            position: sticky;
+            top: 0;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            background: rgba(14, 15, 18, 0.82);
+            backdrop-filter: blur(6px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            z-index: 100;
+        }
+
+        .header-logo {
+            height: 28px;
+            opacity: 0.92;
+        }
+
+        .header-right {
+            margin-left: auto;
+            color: white;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .header-right a {
+            color: #ff9d9d;
+            text-decoration: none;
+        }
+
+        #chat {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            overflow-x: hidden;
+            transition: filter 0.3s ease, opacity 0.3s ease;
+        }
+
+        #chat::-webkit-scrollbar {
+            width: 0;
+            background: transparent;
+        }
+
+        #chat {
+            scrollbar-width: none;
+        }
+
+        .message {
+            line-height: 1.7;
+            font-size: 15px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            max-width: 100%;
+        }
+
+        .user {
+            align-self: flex-end;
+            margin-right: 8px;
+            background-color: rgba(255,255,255,0.10);
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 82%;
+        }
+
+        .pakdahlan {
+            display: flex;
+            gap: 12px;
+        }
+
+        .ai-avatar {
+            width: 26px;
+            height: 26px;
+            min-width: 26px;
+            border-radius: 50%;
+            opacity: var(--avatar-opacity);
+        }
+
+        #inputSection {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 10px 12px;
+            background: rgba(16,17,20,0.88);
+            position: sticky;
+            bottom: 0;
+            margin-bottom: -10px;
+            transition: filter 0.3s ease, opacity 0.3s ease;
+        }
+
+        #inputContainer {
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 6px 12px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+
+        #question {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 16px;
+            padding: 8px;
+            outline: none;
+            resize: none;
+            max-height: 120px;
+            font-family: inherit;
+        }
+
+        #askBtn {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.88);
+            cursor: pointer;
+            padding: 6px;
+        }
+
+        #askBtn svg path {
+            fill: currentColor;
+        }
+
+        #askBtn svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .desc {
+            text-align: center;
+            font-size: 10px;
+            margin-top: 12px;
+            color: #808792;
+            margin-bottom: 2px;
+        }
+
+        .feedback {
+            display: block;
+            text-align: center;
+            margin-top: 4px;
+            font-size: 12px;
+            color: rgba(138, 180, 248, 0.78);
+            text-decoration: none;
+        }
+
+        #footer {
+            padding: 12px 10px;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            background: rgba(16,17,20,0.9);
+            transition: filter 0.3s ease, opacity 0.3s ease;
+        }
+
+        .collab-text {
+            font-size: 10px;
+            color: #7f8792;
+            margin-bottom: 7px;
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .logo-img {
+            height: 18px;
+            opacity: 0.8;
+        }
+
+        .blurred-ui {
+            filter: blur(0.9px) brightness(0.90);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        #accessOverlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            
+            justify-content: center;
+            padding: 22px;
+            background:
+                radial-gradient(circle at top, rgba(120,150,220,0.06), transparent 75%),
+                linear-gradient(to bottom, rgba(8,10,15,0.08), rgba(8,10,15,0.22));
+            backdrop-filter: blur(1px);
+        }
+
+        .overlay-card {
+            width: 100%;
+            max-width: 470px;
+            background: linear-gradient(
+                180deg,
+                rgba(255,255,255,0.050),
+                rgba(255,255,255,0.018)
+            );
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 28px;
+            padding: 28px 22px 22px;
+            margin-top: -48px;   /* ⬅️ ini yang geser ke atas */
+            text-align: center;
+            box-shadow:
+                0 18px 60px rgba(0,0,0,0.42),
+                inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+
+        .overlay-logo {
+            width: 168px;
+            max-width: 72%;
+            height: auto;
+            object-fit: contain;
+            margin: 0 auto 18px;
+            display: block;
+            opacity: 0.98;
+        }
+
+        .overlay-subtitle {
+            font-size: 21px;
+            line-height: 1.3;
+            color: #f2f5fb;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .overlay-meta {
+            font-size: 13px;
+            color: #aab4c2;
+            margin-bottom: 10px;
+            letter-spacing: 0.1px;
+        }
+
+        .overlay-collab {
+            font-size: 11px;
+            color: #8f98a6;
+            line-height: 1.65;
+            margin-bottom: 16px;
+        }
+
+        .overlay-note {
+            font-size: 11px;
+            color: #d2d8e1;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .overlay-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-main,
+        .btn-secondary {
+            border: none;
+            border-radius: 18px;
+            padding: 15px 22px;
+            font-size: 17px;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+            font-family: inherit;
+            cursor: pointer;
+            min-width: 190px;
+            transition: transform 0.16s ease, opacity 0.16s ease, background 0.16s ease;
+        }
+
+        .btn-main:hover,
+        .btn-secondary:hover,
+        .btn-form-primary:hover,
+        .btn-form-secondary:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-main {
+            background: rgba(234, 233, 233, 0.92);
+            color: #16181c;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.06);
+            color: #f1f4f8;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .flash-box {
+            width: 100%;
+            margin: 0 auto 18px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.65;
+        }
+
+        .flash-success {
+            background: rgba(128, 223, 255, 0.314);
+            border: 1px solid rgba(135, 223, 255, 0.329);
+            color: #dceaff;
+        }
+
+        .flash-error {
+            background: rgba(255, 99, 99, 0.14);
+            border: 1px solid rgba(255, 120, 120, 0.20);
+            color: #ffe2e2;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 10001;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(7,9,14,0.80);
+            backdrop-filter: blur(1px);
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-card {
+            width: 100%;
+            max-width: 470px;
+            background: linear-gradient(
+                180deg,
+                rgba(22, 28, 40, 0.94),
+                rgba(15, 20, 31, 0.88)
+            );
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 28px;
+            padding: 28px 22px 22px;
+            box-shadow:
+                0 20px 60px rgba(0,0,0,0.48),
+                inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+
+        .modal-logo {
+            width: 150px;
+            max-width: 68%;
+            display: block;
+            margin: 0 auto 16px;
+            opacity: 0.98;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            color: #f4f7fb;
+            margin: 0 0 10px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .modal-subtitle {
+            font-size: 13px;
+            color: #cad2dc;
+            line-height: 1.5;
+            text-align: center;
+            margin: 0 0 30px;
+        }
+
+        .modal-meta {
+            font-size: 12px;
+            color: #a5afbd;
+            line-height: 1.6;
+            text-align: center;
+            margin: -2px 0 18px;
+        }
+
+        .form-group {
+            margin-top: 5px;   /* ⬅️ ini yang bikin turun */
+            margin-bottom: 5px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            color: #b0b2b3;
+            margin-top: 9px;
+            margin-bottom: 7px;
+            margin-left: 14px;
+            font-weight: 400;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            border-radius: 18px;
+            background: rgba(0,0,0,0.65);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #f5f7fb;
+            padding: 15px 15px;
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: rgba(255,255,255,0.34);
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            border-color: rgba(120,160,255,0.35);
+            box-shadow: 0 0 0 2px rgba(120,160,255,0.08);
+        }
+
+        .form-textarea {
+            min-height: 96px;
+            resize: vertical;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 26px;
+            flex-wrap: wrap;
+        }
+
+        .btn-form-primary,
+        .btn-form-secondary {
+            flex: 1;
+            min-width: 140px;
+            border: none;
+            border-radius: 18px;
+            padding: 14px 16px;
+            font-size: 16px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            letter-spacing: 0.2px;
+        }
+
+        .btn-form-primary {
+            background: linear-gradient(180deg, #bbbcbd, #b2b4b6);
+            color: #16181c;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+        }
+
+        .btn-form-secondary {
+            background: rgba(255,255,255,0.06);
+            color: #eef2f7;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .modal-help {
+            font-size: 13px;
+            color: #acb5c1;
+            text-align: center;
+            margin-top: 14px;
+            line-height: 1.7;
+        }
+
+        .login-help {
+            font-size: 13px;
+            color: #c5ced9;
+            text-align: center;
+            margin-top: 18px;
+            line-height: 1.7;
+        }
+
+        .login-help-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            padding: 0 14px;   /* ⬅️ ini kuncinya */
+        }
+
+        .login-help-row .login-help-link {
+            color: #6ec1ff;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+
+        .login-help-link {
+            color: #6ec1ff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-help-link:hover {
+            text-decoration: underline;
+        }
+
+        
+
+        @media (max-width: 768px) {
+            .btn-main,
+            .btn-secondary {
+                width: 100%;
+                min-width: unset;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #chat {
+                padding: 12px;
+            }
+
+            .user {
+                max-width: 90%;
+            }
+
+            #accessOverlay {
+                padding: 16px;
+            }
+
+            .overlay-card {
+                max-width: 100%;
+                padding: 24px 18px 18px;
+                border-radius: 26px;
+            }
+
+            .overlay-logo {
+                width: 176px;
+                max-width: 76%;
+                margin-bottom: 16px;
+            }
+
+            .overlay-subtitle {
+                font-size: 18px;
+                margin-bottom: 8px;
+            }
+
+            .overlay-meta {
+                font-size: 12px;
+            }
+
+            .overlay-collab {
+                font-size: 11px;
+                margin-bottom: 14px;
+            }
+
+            .overlay-note {
+                font-size: 13px;
+                margin-bottom: 16px;
+            }
+
+            .btn-main,
+            .btn-secondary {
+                width: 100%;
+                min-width: unset;
+                font-size: 16px;
+                padding: 14px 16px;
+                border-radius: 18px;
+            }
+
+            .flash-box {
+                font-size: 13px;
+                padding: 13px 14px;
+                border-radius: 16px;
+            }
+
+            .modal-card {
+                border-radius: 26px;
+                padding: 22px 18px 18px;
+            }
+
+            .modal-logo {
+                width: 160px;
+                max-width: 72%;
+                margin-bottom: 14px;
+            }
+
+            .modal-title {
+                font-size: 22px;
+            }
+
+            .modal-subtitle {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body data-logged-in="{{ 'true' if logged_in else 'false' }}">
+
+    <div id="desktopBlockNotice" style="display:none; padding:14px 16px; text-align:center; background:rgba(255,99,99,0.12); color:#ffe2e2; font-size:13px; line-height:1.6; border-bottom:1px solid rgba(255,120,120,0.18);">
+        Fitur peserta hanya bisa dibuka melalui HP.
+    </div>
+
+    <div id="header" class="{% if not logged_in %}blurred-ui{% endif %}">
+        <img class="header-logo" src="/static/icon_tanya_pak_dahlan.png" alt="Logo">
+        <div class="header-right">
+            {% if logged_in %}
+                <span>Halo, <strong>{{ user_name }}</strong></span>
+                <a href="/logout">Logout</a>
+            {% else %}
+                <span style="color:#cfcfcf;">Program uji coba terbatas</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="chat" class="{% if not logged_in %}blurred-ui{% endif %}">
+        <div class="message pakdahlan">
+            <img class="ai-avatar" src="/static/icon_tanya_dis.png" alt="Avatar">
+            <div>Halo! Saya Dahlan Iskan. Ada yang bisa saya bantu hari ini?</div>
+        </div>
+    </div>
+
+    <div id="inputSection" class="{% if not logged_in %}blurred-ui{% endif %}">
+        <div id="inputContainer">
+            <textarea id="question" rows="1" placeholder="Tanya sesuatu..." oninput="this.style.height='';this.style.height=this.scrollHeight + 'px'"></textarea>
+            <button id="askBtn" onclick="ask()">
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+            </button>
+        </div>
+        <div class="desc">
+            Tanya Pak Dahlan adalah fitur AI. Namanya juga mesin, kadang bisa keliru.
+        </div>
+        <a href="#" class="feedback" onclick="openFeedbackModal(event)">Kirim Masukan</a>
+    </div>
+
+    <div id="footer" class="{% if not logged_in %}blurred-ui{% endif %}">
+        <div class="collab-text">DIS Script Technology kolaborasi dengan SMKN 2 Kota Mojokerto</div>
+        <div class="logo-container">
+            <img class="logo-img" src="/static/logodisscriptputih.png" alt="DIS Script">
+            <img class="logo-img" src="/static/logo_smk_putih.png" alt="SMKN 2">
+            <img class="logo-img" src="/static/logo_disway_putih.png" alt="DISWAY">
+        </div>
+    </div>
+
+    {% if not logged_in %}
+    <div id="accessOverlay">
+        <div class="overlay-card">
+
+            {% if flash_message %}
+            <div class="flash-box flash-success">
+                Terima kasih atas partisipasinya. PIN login akan dikirim ke nomor WhatsApp Anda.
+            </div>
+            {% endif %}
+
+            {% if flash_error %}
+            <div class="flash-box flash-error">{{ flash_error }}</div>
+            {% endif %}
+
+            <img class="overlay-logo" src="/static/icon_tanya_pak_dahlan.png" alt="Logo">
+
+            <div class="overlay-subtitle">
+                Uji Coba Terbatas
+            </div>
+
+            <div class="overlay-meta">
+                Project DIS Script v.1 · 2026
+            </div>
+
+            <div class="overlay-collab">
+                Kolaborasi:<br>
+                DIS Script Technology — SMKN 2 Kota Mojokerto
+            </div>
+
+            <div class="overlay-note">
+                Partisipasi anda sangat berarti bagi kami.
+            </div>
+
+            <div class="overlay-actions">
+                <button class="btn-main" type="button" onclick="openModal('requestModal')">
+                    Ajukan Akses
+                </button>
+                <button class="btn-secondary" type="button" onclick="openModal('loginModal')">
+                    Login
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="requestModal" onclick="closeOnBackdrop(event, 'requestModal')">
+        <div class="modal-card">
+            <h2 class="modal-title">Permintaan Akses</h2>
+            <div class="modal-subtitle">
+                Silakan isi data berikut. PIN login akan kami kirimkan ke nomor WhatsApp Anda.
+            </div>
+
+            <form method="POST" action="/request-access">
+                <div class="form-group">
+                    <label class="form-label" for="request_name">Nama Lengkap</label>
+                    <input class="form-input" type="text" id="request_name" name="name" placeholder="Tulis nama lengkap" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="request_phone">Nomor WhatsApp</label>
+                    <input class="form-input" type="tel" id="request_phone" name="phone" placeholder="Contoh: 081234567890" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="request_note">Keterangan (opsional)</label>
+                    <textarea class="form-textarea" id="request_note" name="note" placeholder="Ingin tahu, pengen coba, ikut dukung, atau informasi lain."></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-form-primary" type="submit">Kirim Permintaan</button>
+                    <button class="btn-form-secondary" type="button" onclick="closeModal('requestModal')">Kembali</button>
+                </div>
+            </form>
+
+            <div class="modal-help">
+                Project DIS Script v.1 · 2026
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="loginModal" onclick="closeOnBackdrop(event, 'loginModal')">
+        <div class="modal-card">
+            <img class="modal-logo" src="/static/icon_tanya_pak_dahlan.png" alt="Logo">
+
+            <div class="modal-meta">
+                Uji coba terbatas · Project DIS Script v.1 · 2026
+            </div>
+
+            <form method="POST" action="/login">
+                <div class="form-group">
+                    <label class="form-label" for="login_phone">Nomor WhatsApp</label>
+                    <input class="form-input" type="tel" id="login_phone" name="phone" placeholder="Contoh: 081234567890" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="login_password">PIN</label>
+                    <input class="form-input" type="password" id="login_password" name="password" placeholder="Masukkan PIN" required>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-form-primary" type="submit">Masuk</button>
+                    <button class="btn-form-secondary" type="button" onclick="closeModal('loginModal')">Kembali</button>
+                </div>
+            </form>
+
+            <div class="login-help login-help-row">
+                <a href="#" class="login-help-link" onclick="showForgotPinAlert(event)">LUPA PIN?</a>
+                <a class="login-help-link" href="/akses">DAFTAR</a>
+            </div>
+        </div>
+
+        
+    {% endif %}
+    
+    <div class="modal" id="feedbackModal" onclick="closeOnBackdrop(event, 'feedbackModal')">
+            <div class="modal-card">
+                <h2 class="modal-title">Kirim Masukan</h2>
+
+                <div class="modal-subtitle">
+                    Masukan Anda akan langsung masuk ke sistem insight kami.
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="feedback_message">Masukan</label>
+                    <textarea
+                        class="form-textarea"
+                        id="feedback_message"
+                        placeholder="Tulis saran, kritik, bug, atau masukan Anda."
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="feedback_related_question">Pertanyaan terkait (opsional)</label>
+                    <input
+                        class="form-input"
+                        type="text"
+                        id="feedback_related_question"
+                        placeholder="Misalnya: jawaban tadi soal bisnis kurang pas"
+                    >
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-form-primary" type="button" onclick="submitFeedback()">Kirim</button>
+                    <button class="btn-form-secondary" type="button" onclick="closeModal('feedbackModal')">Batal</button>
+                </div>
+
+                <div class="modal-help" id="feedback_status">
+                    Masukan akan membantu kami memperbaiki kualitas fitur.
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+    <script>
+
+        function isMobileBrowser() {
+            const ua = (navigator.userAgent || "").toLowerCase();
+            return /android|iphone|ipod|mobile|blackberry|windows phone|opera mini|iemobile/.test(ua);
+        }
+
+        function showDesktopBlockNotice() {
+            const notice = document.getElementById("desktopBlockNotice");
+            if (notice) notice.style.display = "block";
+        }
+
+        function openModal(id) {
+            if (!isMobileBrowser()) {
+                showDesktopBlockNotice();
+                return;
+            }
+
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function closeOnBackdrop(event, id) {
+            if (event.target.id === id) {
+                closeModal(id);
+            }
+        }
+
+        function openFeedbackModal(event) {
+            if (event) event.preventDefault();
+
+            const isLoggedIn = document.body.dataset.loggedIn === "true";
+            if (!isLoggedIn) {
+                openModal('loginModal');
+                return;
+            }
+
+            openModal('feedbackModal');
+        }
+
+        window.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal('requestModal');
+                closeModal('loginModal');
+                closeModal('feedbackModal');
+            }
+        });
+
+        async function ask() {
+
+                if (!isMobileBrowser()) {
+                    showDesktopBlockNotice();
+                    return;
+                }
+            const isLoggedIn = document.body.dataset.loggedIn === "true";
+
+            if (!isLoggedIn) {
+                openModal('loginModal');
+                return;
+            }
+
+            let q = document.getElementById("question").value.trim();
+            if (!q) return;
+
+            const chat = document.getElementById("chat");
+
+            let userDiv = document.createElement("div");
+            userDiv.className = "message user";
+            userDiv.innerText = q;
+            chat.appendChild(userDiv);
+            chat.scrollTop = chat.scrollHeight;
+
+            document.getElementById("question").value = "";
+            document.getElementById("question").style.height = 'auto';
+
+            let thinkingDiv = document.createElement("div");
+            thinkingDiv.className = "message pakdahlan";
+            thinkingDiv.innerHTML = '<img class="ai-avatar" src="/static/icon_tanya_dis.png" alt="Avatar"> <div style="color:#aeb6c2; font-style: italic;">Sedang mencari jawaban...</div>';
+            chat.appendChild(thinkingDiv);
+            chat.scrollTop = chat.scrollHeight;
+
+            try {
+                let res = await fetch("/ask", {
+                    method: "POST",
+                    headers: {"Content-Type":"application/json"},
+                    body: JSON.stringify({question:q})
+                });
+
+                let data = await res.json();
+
+                if (thinkingDiv.parentNode) {
+                    chat.removeChild(thinkingDiv);
+                }
+
+                let ansContainer = document.createElement("div");
+                ansContainer.className = "message pakdahlan";
+                ansContainer.innerHTML = '<img class="ai-avatar" src="/static/icon_tanya_dis.png" alt="Avatar"> <div class="ans-text"></div>';
+                chat.appendChild(ansContainer);
+
+                let text = data.answer || "Maaf, jawaban belum tersedia.";
+                let target = ansContainer.querySelector(".ans-text");
+
+                let i = 0;
+                let speed = 10;
+
+                function typeWriter() {
+                    if (i < text.length) {
+                        target.innerText += text.charAt(i);
+                        i++;
+                        chat.scrollTop = chat.scrollHeight;
+                        setTimeout(typeWriter, speed);
+                    }
+                }
+
+                typeWriter();
+
+            } catch (e) {
+                if (thinkingDiv.parentNode) {
+                    chat.removeChild(thinkingDiv);
+                }
+                alert("Gagal memuat jawaban.");
+            }
+        }
+
+        const questionBox = document.getElementById("question");
+        if (questionBox) {
+            questionBox.addEventListener("keypress", function(e) {
+                if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    ask();
+                }
+            });
+        }
+
+        async function submitFeedback() {
+
+            if (!isMobileBrowser()) {
+                showDesktopBlockNotice();
+                return;
+            }
+            const messageEl = document.getElementById("feedback_message");
+            const relatedEl = document.getElementById("feedback_related_question");
+            const statusEl = document.getElementById("feedback_status");
+
+            const message = (messageEl?.value || "").trim();
+            const relatedQuestion = (relatedEl?.value || "").trim();
+
+            if (!message) {
+                if (statusEl) statusEl.textContent = "Masukan masih kosong.";
+                return;
+            }
+
+            try {
+                const res = await fetch("/submit_feedback", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        related_question: relatedQuestion
+                    })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    if (statusEl) statusEl.textContent = data.message || "Gagal mengirim masukan.";
+                    return;
+                }
+
+                if (statusEl) statusEl.textContent = "Terima kasih. Masukan Anda sudah kami simpan.";
+                if (messageEl) messageEl.value = "";
+                if (relatedEl) relatedEl.value = "";
+
+                setTimeout(() => {
+                    closeModal('feedbackModal');
+                    if (statusEl) {
+                        statusEl.textContent = "Masukan akan membantu kami memperbaiki kualitas fitur.";
+                    }
+                }, 900);
+
+            } catch (err) {
+                if (statusEl) statusEl.textContent = "Terjadi gangguan saat mengirim masukan.";
+                console.error(err);
+            }
+        }
+
+        function showForgotPinAlert(event) {
+            event.preventDefault();
+            alert(
+                "Lupa PIN?\n\n" +
+                "Hubungi admin/pendaftaran melalui WhatsApp untuk reset akses.\n\n" +
+                "Admin: 081359991515"
+            );
+        }
+
+
+        document.addEventListener("DOMContentLoaded", function() {
+    const requestForm = document.querySelector('form[action="/request-access"]');
+    const loginForm = document.querySelector('form[action="/login"]');
+
+    if (requestForm) {
+        requestForm.addEventListener("submit", function(e) {
+            if (!isMobileBrowser()) {
+                e.preventDefault();
+                showDesktopBlockNotice();
+            }
+        });
+    }
+
+    if (loginForm) {
+        loginForm.addEventListener("submit", function(e) {
+            if (!isMobileBrowser()) {
+                e.preventDefault();
+                showDesktopBlockNotice();
+            }
+        });
+    }
+});
+
+
+    </script>
+</body>
+</html>
