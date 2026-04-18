@@ -125,15 +125,25 @@
         }
 
         #inputSection {
-            width: 100%;
-            max-width: 800px;
+            width: calc(100% - 34px);
+            max-width: 730px;
             margin: 0 auto;
             padding: 10px 12px;
             background: rgba(16,17,20,0.88);
             position: sticky;
             bottom: 0;
             margin-bottom: -10px;
-            transition: filter 0.3s ease, opacity 0.3s ease;
+            transition:
+                filter 0.3s ease,
+                opacity 0.3s ease,
+                width 0.28s ease,
+                max-width 0.28s ease,
+                transform 0.28s ease;
+        }
+
+        #inputSection.input-active {
+            width: calc(100% - 24px);
+            max-width: 800px;
         }
 
         #inputContainer {
@@ -382,8 +392,8 @@
             max-width: 470px;
             background: linear-gradient(
                 180deg,
-                rgba(255,255,255,0.050),
-                rgba(255,255,255,0.018)
+                rgba(255,255,255,0.075),
+                rgba(255,255,255,0.035)
             );
             backdrop-filter: blur(2px);
             border: 1px solid rgba(255,255,255,0.05);
@@ -572,6 +582,16 @@
                 padding: 16px;
             }
 
+            #inputSection {
+                width: calc(100% - 26px);
+                max-width: 100%;
+            }
+
+            #inputSection.input-active {
+                width: calc(100% - 14px);
+                max-width: 100%;
+            }
+
             .overlay-card {
                 max-width: 100%;
                 padding: 24px 18px 18px;
@@ -636,6 +656,8 @@
             .modal-subtitle {
                 font-size: 14px;
             }
+
+            
         }
     </style>
 </head>
@@ -917,6 +939,12 @@
 
             let q = document.getElementById("question").value.trim();
             if (!q) return;
+
+            document.getElementById("question").blur();
+            setTimeout(() => {
+                document.getElementById("question").blur();
+            }, 50);
+
 
             const chat = document.getElementById("chat");
 
