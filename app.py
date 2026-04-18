@@ -829,6 +829,34 @@ def activate_user(user_id):
 
     return redirect("/admin")
 
+@app.route("/admin/reset-db")
+def reset_db():
+    if not session.get("admin_logged_in"):
+        return redirect("/admin/login")
+
+    conn = get_db_connection()
+
+    conn.execute("DELETE FROM users")
+    conn.execute("DELETE FROM user_sessions")
+    conn.execute("DELETE FROM chat_logs")
+    conn.execute("DELETE FROM user_feedback")
+    conn.execute("DELETE FROM access_requests")
+
+    conn.commit()
+    conn.close()
+
+    return "✅ Database berhasil di-reset"
+
+@app.route("/admin/reset-db")
+def reset_db():
+    key = request.args.get("key")
+
+    if key != "RESET2026AMAN":
+        return "❌ Akses ditolak"
+
+    conn = get_db_connection()
+    ...
+
 
 # =========================
 # PUBLIC ROUTES
