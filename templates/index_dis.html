@@ -329,8 +329,9 @@
         }
 
         .btn-main {
-            background: rgba(234, 233, 233, 0.92);
+            background: linear-gradient(180deg, #bbbcbd, #b2b4b6);
             color: #16181c;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.18);
         }
 
         .btn-secondary {
@@ -381,15 +382,15 @@
             max-width: 470px;
             background: linear-gradient(
                 180deg,
-                rgba(22, 28, 40, 0.94),
-                rgba(15, 20, 31, 0.88)
+                rgba(255,255,255,0.050),
+                rgba(255,255,255,0.018)
             );
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(255,255,255,0.05);
             border-radius: 28px;
             padding: 28px 22px 22px;
             box-shadow:
-                0 20px 60px rgba(0,0,0,0.48),
+                0 18px 60px rgba(0,0,0,0.42),
                 inset 0 1px 0 rgba(255,255,255,0.05);
         }
 
@@ -455,7 +456,9 @@
 
         .form-input::placeholder,
         .form-textarea::placeholder {
-            color: rgba(255,255,255,0.34);
+            color: rgba(255,255,255,0.22);
+            font-size: 12px;
+            font-weight: 400;
         }
 
         .form-input:focus,
