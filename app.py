@@ -847,16 +847,6 @@ def reset_db():
 
     return "✅ Database berhasil di-reset"
 
-@app.route("/admin/reset-db")
-def reset_db():
-    key = request.args.get("key")
-
-    if key != "RESET2026AMAN":
-        return "❌ Akses ditolak"
-
-    conn = get_db_connection()
-    ...
-
 
 # =========================
 # PUBLIC ROUTES
