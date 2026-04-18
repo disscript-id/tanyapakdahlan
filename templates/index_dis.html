@@ -956,6 +956,11 @@
 
             document.getElementById("question").value = "";
             document.getElementById("question").style.height = 'auto';
+            const inputSection = document.getElementById("inputSection");
+            if (inputSection) {
+                inputSection.classList.remove("input-active");
+            }
+
 
             let thinkingDiv = document.createElement("div");
             thinkingDiv.className = "message pakdahlan";
@@ -1024,7 +1029,21 @@
         }
 
         const questionBox = document.getElementById("question");
+        const inputSection = document.getElementById("inputSection");
+
         if (questionBox) {
+            questionBox.addEventListener("focus", function() {
+                if (inputSection) {
+                    inputSection.classList.add("input-active");
+                }
+            });
+
+            questionBox.addEventListener("blur", function() {
+                if (inputSection && !questionBox.value.trim()) {
+                    inputSection.classList.remove("input-active");
+                }
+            });
+
             questionBox.addEventListener("keypress", function(e) {
                 if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
