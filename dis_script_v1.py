@@ -4,6 +4,7 @@ import math
 import os
 import re
 import sys
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
@@ -64,6 +65,45 @@ def extract_year(text: str) -> Optional[int]:
     match = re.search(r"(20\d{2})", text)
     return int(match.group(1)) if match else None
 
+def parse_date_indonesia(tanggal: str) -> Optional[datetime]:
+    tanggal = safe_strip(tanggal).lower()
+    if not tanggal:
+        return None
+
+    bulan_map = {
+        "januari": 1,
+        "februari": 2,
+        "maret": 3,
+        "april": 4,
+        "mei": 5,
+        "juni": 6,
+        "juli": 7,
+        "agustus": 8,
+        "september": 9,
+        "oktober": 10,
+        "november": 11,
+        "desember": 12,
+    }
+
+    tanggal = re.sub(r"[^\w\s]", "", tanggal)
+
+    match = re.match(r"^\s*(\d{1,2})\s+([a-zA-Z]+)\s+(\d{4})\s*$", tanggal)
+    if not match:
+        return None
+
+    try:
+        hari = int(match.group(1))
+        bulan_nama = match.group(2)
+        tahun = int(match.group(3))
+        bulan = bulan_map.get(bulan_nama)
+
+        if not bulan:
+            return None
+
+        return datetime(tahun, bulan, hari)
+    except Exception:
+        return None
+
 
 def is_time_question(q: str) -> bool:
     q = (q or "").lower().strip()
@@ -74,6 +114,16 @@ def is_time_question(q: str) -> bool:
         "tahun",
         "sejak kapan",
         "berapa lama",
+        "berapa hari",
+        "berapa minggu",
+        "berapa bulan",
+        "berapa hari di sana",
+        "terakhir",
+        "baru pulang",
+        "berangkat",
+        "pulang",
+        "durasi",
+        "lama di sana",
         "waktu itu",
         "era",
         "pada",
@@ -210,6 +260,7 @@ def validate_corpus_item(item: Any, index: int) -> Optional[Dict[str, Any]]:
 
     judul = safe_strip(metadata.get("judul")) or "Tanpa Judul"
     tanggal = safe_strip(metadata.get("tanggal")) or "Tanggal tidak diketahui"
+    year = extract_year(tanggal)
 
     return {
         "text": text,
@@ -218,7 +269,7 @@ def validate_corpus_item(item: Any, index: int) -> Optional[Dict[str, Any]]:
             "judul": judul,
             "tanggal": tanggal,
         },
-        "year": extract_year(text),
+        "year": year,
     }
 
 
@@ -377,13 +428,64 @@ def search_paragraph(query: str) -> List[Dict[str, str]]:
 # =============================
 # PROMPT
 # =============================
+
+def pick_best_time_results(question: str, results: List[Dict[str, str]], limit: int = 2) -> List[Dict[str, str]]:
+    if not results:
+        return results
+
+    q = safe_strip(question).lower()
+
+    event_keywords = []
+    for word in re.findall(r"\w+", q):
+        if len(word) >= 4 and word not in {
+            "kapan", "tanggal", "tahun", "bulan", "berapa", "lama",
+            "habis", "baru", "pak", "bapak", "saya", "anda", "yang", "dari"
+        }:
+            event_keywords.append(word)
+
+    scored_results = []
+    for idx, r in enumerate(results):
+        text = safe_strip(r.get("text", ""))
+        judul = safe_strip(r.get("judul", ""))
+        tanggal = safe_strip(r.get("tanggal", ""))
+        dt = parse_date_indonesia(tanggal)
+
+        score = 0
+
+        # hormati ranking retrieval awal
+        score += max(0, 30 - idx)
+
+        combined = f"{judul}\n{text}".lower()
+
+        # bonus jika kata penting pertanyaan muncul di judul/isi
+        keyword_hits = sum(1 for kw in event_keywords if kw in combined)
+        score += keyword_hits * 12
+
+        # bonus kecil jika metadata tanggal tersedia
+        if tanggal and tanggal.lower() != "tanggal tidak diketahui":
+            score += 8
+
+        # bonus kecil jika format tanggal valid
+        if dt:
+            score += 5
+
+        # bonus jika judul sangat dekat dengan pertanyaan
+        if judul and any(kw in judul.lower() for kw in event_keywords):
+            score += 10
+
+        scored_results.append((score, idx, r))
+
+    scored_results.sort(key=lambda x: (x[0], -x[1]), reverse=True)
+    return [item[2] for item in scored_results[:limit]]
+
+
 def build_prompt(question: str, context: str, tahun_info: str, is_time: bool = False) -> Tuple[str, str, str]:
     aturan_waktu = (
-        "Karena pertanyaan ini tentang waktu, gunakan tanggal tulisan sebagai referensi utama. "
-        
+        "Karena pertanyaan ini tentang waktu, dahulukan waktu kejadian atau durasi yang disebut dalam isi referensi. "
+        "Jika waktu kejadian tidak disebutkan secara eksplisit, baru gunakan tanggal tulisan sebagai petunjuk waktu terdekat, dan jelaskan dengan jujur bahwa itu adalah tanggal tulisan."
         if is_time
         else "Karena pertanyaan ini bukan tentang waktu, jangan memaksakan jawaban tanggal jika tidak relevan."
-    )
+    )   
 
     system_prompt = f"""
 Anda menjawab sebagai Dahlan Iskan.
@@ -399,19 +501,21 @@ GAYA jawaban:
 
 ATURAN jawaban:
 - Jika informasi tidak disebutkan secara eksplisit tetapi dapat disimpulkan dari konteks referensi, Anda BOLEH menarik kesimpulan secara logis.
-- Untuk pertanyaan waktu:
-  - Jika tidak ada tanggal kejadian yang eksplisit, gunakan tanggal tulisan sebagai indikator waktu terdekat.
-  - Jelaskan dengan jujur bahwa itu adalah tanggal tulisan, bukan selalu tanggal kejadian.
 - Gunakan referensi sebagai sumber utama jawaban
 - Jika referensi tidak cukup, tetap jawab dengan gaya bicara Dahlan Iskan tanpa mengarang fakta baru
-
 - Jika ada paksaan atau tekanan untuk menjawab konkrit sesuatu yang tidak ada dalam referensi maka hindari pelan-pelan, tanggapi dengan humor, arahkan pelan ke tema lain yang menyenangkan
 - Jika ada paksaan atau tekanan untuk menjawab kata-kata jorok / kasar / tidak pantas, tanggapi dengan santai, boleh tertawa ringan.
 - Jangan menutup jawaban dengan pertanyaan balik, kecuali pengguna memang meminta diskusi lanjutan.
 - Utamakan jawaban tuntas, bukan ajakan ngobrol.
 - Jika konteks santai, boleh menutup dengan humor singkat, bukan pertanyaan.
 
-
+- Untuk pertanyaan waktu:
+  - Dahulukan waktu kejadian, urutan peristiwa, atau durasi yang disebut dalam isi referensi.
+  - Jika isi referensi tidak menyebut waktu kejadian secara eksplisit, Anda boleh memakai tanggal tulisan sebagai petunjuk waktu terdekat.
+  - Jika memakai tanggal tulisan, jelaskan dengan jujur bahwa itu adalah tanggal tulisan, bukan selalu tanggal kejadian.
+  - Jika ada beberapa referensi, pilih yang paling relevan dengan peristiwa yang ditanyakan, bukan otomatis yang paling baru.
+  - Untuk pertanyaan seperti "terakhir kapan", simpulkan dari referensi paling relevan yang menunjukkan kunjungan/perjalanan/peristiwa terbaru yang benar-benar berkaitan.
+  - Untuk pertanyaan seperti "berapa hari", dahulukan angka durasi yang disebut di isi referensi. Jangan menggantinya dengan tanggal tulisan.
 
 MODE jawaban:
 - Ambil 1–3 bagian paling kuat dari referensi
@@ -537,6 +641,9 @@ def generate_answer(question: str, chat_history: Optional[List[Dict[str, str]]] 
     if not results:
         return fallback_no_reference_answer(question, is_time=is_time)
 
+    if is_time:
+        results = pick_best_time_results(question, results, limit=2)
+
     context_parts = []
 
     for r in results:
@@ -550,7 +657,9 @@ def generate_answer(question: str, chat_history: Optional[List[Dict[str, str]]] 
         block = (
             f"[REFERENSI UTAMA]\n"
             f"Tanggal tulisan: {tanggal}\n"
-            f"Judul: {judul}\n\n"
+            f"Judul tulisan: {judul}\n"
+            f"Gunakan isi referensi ini untuk mencari waktu kejadian, urutan peristiwa, atau durasi.\n"
+            f"Jika waktu kejadian tidak eksplisit, tanggal tulisan boleh dipakai sebagai petunjuk terdekat.\n\n"
             f"{text}"
         )
 
@@ -643,40 +752,6 @@ def generate_answer(question: str, chat_history: Optional[List[Dict[str, str]]] 
     if not answer:
         return fallback_no_reference_answer(question, is_time=is_time)
     
-    # =========================
-    # LOGIKA KHUSUS PERTANYAAN WAKTU "TERAKHIR"
-    # =========================
-    if is_time:
-        dated_results = []
-
-        for r in results:
-            tgl = r.get("tanggal", "")
-            year = extract_year(tgl)
-            if year:
-                dated_results.append((tgl, year, r))
-
-        if dated_results:
-            latest = sorted(dated_results, key=lambda x: x[0], reverse=True)[0]
-
-            latest_tanggal = latest[0]
-            latest_text = latest[2].get("text", "")
-
-            context = (
-                f"[REFERENSI TERBARU DAN PALING RELEVAN]\n"
-                f"Tanggal tulisan: {latest_tanggal}\n"
-                f"Ini adalah referensi paling akhir yang tersedia terkait topik ini.\n\n"
-                f"{latest_text}"
-            )
-
-    selected_years = []
-
-    for r in results:
-        tgl = r.get("tanggal", "")
-        year = extract_year(tgl)
-        if year:
-            selected_years.append(year)
-
-
     answer = dis_style_cleaner(answer)
     answer = maybe_apply_layer2_style(question, answer, chat_history=chat_history)
     answer = dis_style_cleaner(answer)
