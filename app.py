@@ -112,7 +112,7 @@ def init_db():
             name TEXT,
             note TEXT,
             is_active INTEGER DEFAULT 1,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            created_at TIMESTAMP DEFAULT (datetime('now', '+7 hours'))
             last_login_at TIMESTAMP
         )
         '''
@@ -127,7 +127,7 @@ def init_db():
             feedback_type TEXT,
             message TEXT,
             related_question TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            created_at TIMESTAMP DEFAULT (datetime('now', '+7 hours'))
         )
         '''
     )
@@ -140,7 +140,7 @@ def init_db():
             phone TEXT NOT NULL,
             note TEXT,
             status TEXT DEFAULT 'pending',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            created_at TIMESTAMP DEFAULT (datetime('now', '+7 hours'))
         )
         '''
     )
@@ -156,7 +156,7 @@ def init_db():
             intent_category TEXT,
             sentiment_score TEXT,
             ip_address TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            created_at TIMESTAMP DEFAULT (datetime('now', '+7 hours'))
         )
         '''
     )
@@ -987,7 +987,7 @@ def login():
 
     conn = get_db_connection()
     conn.execute(
-        "UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = ?",
+        "UPDATE users SET last_login_at = datetime('now', '+7 hours') WHERE id = ?",
         (user["id"],),
     )
     conn.commit()
@@ -1022,7 +1022,7 @@ def logout():
                 session_id, user_phone, session_start, session_end,
                 duration_seconds, message_count, ip_address
             )
-            VALUES (?, ?, datetime('now', ?), datetime('now'), ?, ?, ?)
+            VALUES (?, ?, datetime('now', ?, '+7 hours'), datetime('now', '+7 hours'), ?, ?, ?)
             ''',
             (
                 session.get("session_id"),

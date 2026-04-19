@@ -1035,7 +1035,7 @@
             thinkingDiv.className = "message pakdahlan";
             thinkingDiv.innerHTML = `
                 <img class="ai-avatar" src="/static/icon_tanya_dis.png" alt="Avatar">
-                <div style="color:#aeb6c2; font-style: italic;">sedang berpikir...</div>
+                <div style="color:#aeb6c2; font-style: italic;">berpikir...</div>
             `;
             chat.appendChild(thinkingDiv);
             chat.scrollTop = chat.scrollHeight;
@@ -1048,7 +1048,7 @@
 
                 if (!textEl) return;
 
-                textEl.innerText = "sedang berpikir" + ".".repeat(dots);
+                textEl.innerText = "berpikir" + ".".repeat(dots);
             }, 400);
 
 
@@ -1223,6 +1223,22 @@
                 }
             }, { passive: true });
         });
+
+function formatWIB(datetimeString) {
+    if (!datetimeString) return "";
+
+    const date = new Date(datetimeString);
+
+    return date.toLocaleString('id-ID', {
+        timeZone: 'Asia/Jakarta',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+}
 
     </script>
 </body>
