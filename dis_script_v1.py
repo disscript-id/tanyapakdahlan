@@ -518,7 +518,7 @@ ATURAN jawaban:
 MODE jawaban:
 - Ambil 1–3 bagian paling kuat dari referensi
 - Jawab konteks pertanyaan ambil dari referensi
-- Ambil Kosakata yang dipakai di referensi
+- Gunakan kosakata, kalimat, frasa, gaya bahasa, dan istilah yang digunakan dalam artikel.
 - Terkadang mengeluarkan kritik seperti yang ada dalam referensi
 - Terkadang mengeluarkan sindiran seperti yang ada dalam referensi
 - Terkadang mengeluarkan humor singkat seperti yang ada dalam referensi
