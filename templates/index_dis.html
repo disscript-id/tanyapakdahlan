@@ -866,6 +866,72 @@
 
 
     <script>
+        let wakeLock = null;
+        let wakeLockIdleTimer = null;
+        const WAKELOCK_IDLE_MS = 25000; // 25 detik
+
+        async function requestScreenWakeLock() {
+            try {
+                if (!('wakeLock' in navigator)) {
+                    console.log("Wake Lock API tidak didukung browser ini.");
+                    return false;
+                }
+
+                if (wakeLock && !wakeLock.released) {
+                    return true;
+                }
+
+                wakeLock = await navigator.wakeLock.request('screen');
+
+                wakeLock.addEventListener('release', () => {
+                    console.log("Wake lock dilepas.");
+                });
+
+                console.log("Wake lock aktif.");
+                return true;
+            } catch (err) {
+                console.log("Gagal mengaktifkan wake lock:", err);
+                return false;
+            }
+        }
+
+        async function releaseScreenWakeLock() {
+            try {
+                if (wakeLock && !wakeLock.released) {
+                    await wakeLock.release();
+                }
+            } catch (err) {
+                console.log("Gagal melepas wake lock:", err);
+            } finally {
+                wakeLock = null;
+            }
+        }
+
+        async function keepScreenAwakeFor25Seconds() {
+            await requestScreenWakeLock();
+
+            if (wakeLockIdleTimer) {
+                clearTimeout(wakeLockIdleTimer);
+            }
+
+            wakeLockIdleTimer = setTimeout(() => {
+                releaseScreenWakeLock();
+            }, WAKELOCK_IDLE_MS);
+        }
+
+        function resetWakeLockTimer() {
+            keepScreenAwakeFor25Seconds();
+        }
+
+        document.addEventListener('visibilitychange', async function() {
+            if (document.visibilityState === 'visible') {
+                if (wakeLockIdleTimer) {
+                    await keepScreenAwakeFor25Seconds();
+                }
+            } else {
+                await releaseScreenWakeLock();
+            }
+        });
 
         function isMobileBrowser() {
             const ua = (navigator.userAgent || "").toLowerCase();
@@ -940,6 +1006,9 @@
             let q = document.getElementById("question").value.trim();
             if (!q) return;
 
+            await keepScreenAwakeFor25Seconds();
+
+
             document.getElementById("question").blur();
             setTimeout(() => {
                 document.getElementById("question").blur();
@@ -991,6 +1060,7 @@
                 });
 
                 let data = await res.json();
+                await keepScreenAwakeFor25Seconds();
 
                 if (thinkingDiv.parentNode) {
                     clearInterval(interval);
@@ -1013,7 +1083,14 @@
                         target.innerText += text.charAt(i);
                         i++;
                         chat.scrollTop = chat.scrollHeight;
+
+                        if (i % 40 === 0) {
+                            resetWakeLockTimer();
+                        }
+
                         setTimeout(typeWriter, speed);
+                    } else {
+                        resetWakeLockTimer();
                     }
                 }
 
@@ -1139,6 +1216,13 @@
     }
 });
 
+        ['click', 'touchstart', 'keydown', 'scroll'].forEach(evt => {
+            document.addEventListener(evt, function() {
+                if (document.body.dataset.loggedIn === "true") {
+                    resetWakeLockTimer();
+                }
+            }, { passive: true });
+        });
 
     </script>
 </body>
