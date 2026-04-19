@@ -112,7 +112,7 @@ def init_db():
             name TEXT,
             note TEXT,
             is_active INTEGER DEFAULT 1,
-            created_at TIMESTAMP DEFAULT (datetime('now', '+7 hours'))
+            created_at TIMESTAMP DEFAULT (datetime('now', '+7 hours')),
             last_login_at TIMESTAMP
         )
         '''
