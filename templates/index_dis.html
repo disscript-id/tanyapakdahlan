@@ -77,7 +77,7 @@
             padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 20px;
             width: 100%;
             max-width: 800px;
             margin: 0 auto;
@@ -93,8 +93,6 @@
         #chat {
             scrollbar-width: none;
         }
-
-        
 
         .message {
             line-height: 1.7;
@@ -114,7 +112,6 @@
         }
 
         .pakdahlan {
-            align-items: flex-start;
             display: flex;
             gap: 12px;
         }
@@ -126,71 +123,6 @@
             border-radius: 50%;
             opacity: var(--avatar-opacity);
         }
-
-        .ai-avatar {
-            margin-top: 2px;
-        }
-
-        .pakdahlan.answer-message {
-            align-items: flex-start;
-        }
-
-        .answer-bubble {
-            position: relative;
-            flex: 1;
-            min-width: 0;
-            padding-right: 4px;
-            margin-top: -6px;
-        }
-
-        .ans-text {
-            line-height: 1.72;
-            color: var(--text-main);
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-
-        .answer-bubble.is-typing .ans-text {
-            padding-bottom: 12px;
-        }
-
-        .typing-fade {
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            height: 56px;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.22s ease;
-            background: linear-gradient(
-                to bottom,
-                rgba(16,17,20,0),
-                rgba(16,17,20,0.40) 42%,
-                rgba(16,17,20,0.82) 78%,
-                rgba(16,17,20,0.98)
-            );
-        }
-
-        .answer-bubble.is-typing .typing-fade {
-            opacity: 1;
-        }
-
-        .typing-caret {
-            display: inline-block;
-            width: 8px;
-            margin-left: 2px;
-            color: rgba(237,241,247,0.72);
-            animation: blinkCaret 0.9s step-end infinite;
-        }
-
-        @keyframes blinkCaret {
-            50% {
-                opacity: 0.18;
-            }
-        }
-
-
 
         #inputSection {
             width: calc(100% - 34px);
@@ -443,22 +375,16 @@
             position: fixed;
             inset: 0;
             z-index: 10001;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             padding: 20px;
             background: rgba(7,9,14,0.80);
             backdrop-filter: blur(1px);
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            transition: opacity 0.18s ease, visibility 0.18s ease;
         }
 
         .modal.show {
-            opacity: 1;
-            visibility: visible;
-            pointer-events: auto;
+            display: flex;
         }
 
         .modal-card {
@@ -476,12 +402,6 @@
             box-shadow:
                 0 18px 60px rgba(0,0,0,0.42),
                 inset 0 1px 0 rgba(255,255,255,0.05);
-            transform: translateY(10px) scale(0.985);
-            transition: transform 0.20s ease, opacity 0.20s ease;
-        }
-
-        .modal.show .modal-card {
-            transform: translateY(0) scale(1);
         }
 
         .modal-logo {
@@ -765,7 +685,6 @@
             <img class="ai-avatar" src="/static/icon_tanya_dis.png" alt="Avatar">
             <div>Halo! Saya Dahlan Iskan. Ada yang bisa saya bantu hari ini?</div>
         </div>
-        
     </div>
 
     <div id="inputSection" class="{% if not logged_in %}blurred-ui{% endif %}">
@@ -896,7 +815,7 @@
 
             <div class="login-help login-help-row">
                 <a href="#" class="login-help-link" onclick="showForgotPinAlert(event)">LUPA PIN?</a>
-                <a href="#" class="login-help-link" onclick="switchModal(event, 'loginModal', 'requestModal')">DAFTAR</a>
+                <a class="login-help-link" href="/akses">DAFTAR</a>
             </div>
         </div>
 
@@ -1051,30 +970,6 @@
             }
         }
 
-        function switchModal(event, fromId, toId) {
-            if (event) event.preventDefault();
-
-            if (!isMobileBrowser()) {
-                showDesktopBlockNotice();
-                return;
-            }
-
-            const fromModal = document.getElementById(fromId);
-            const toModal = document.getElementById(toId);
-
-            if (!toModal) return;
-
-            if (fromModal) {
-                fromModal.classList.remove('show');
-            }
-
-            setTimeout(() => {
-                toModal.classList.add('show');
-                document.body.style.overflow = 'hidden';
-            }, 170);
-        }
-
-
         function openFeedbackModal(event) {
             if (event) event.preventDefault();
 
@@ -1094,41 +989,6 @@
                 closeModal('feedbackModal');
             }
         });
-
-        function isNearBottom(container, threshold = 140) {
-            const distanceFromBottom =
-                container.scrollHeight - container.scrollTop - container.clientHeight;
-            return distanceFromBottom < threshold;
-        }
-
-        function scrollMessageIntoView(chat, messageEl) {
-            if (!chat || !messageEl) return;
-
-            const chatRect = chat.getBoundingClientRect();
-            const msgRect = messageEl.getBoundingClientRect();
-
-            const offsetTopInsideChat = msgRect.top - chatRect.top + chat.scrollTop;
-
-            // ⬇️ ini bikin message naik ke atas layar
-            const topTarget = Math.max(offsetTopInsideChat - 20, 0);
-
-            chat.scrollTo({
-                top: topTarget,
-                behavior: "smooth"
-            });
-        }
-
-        function splitTextForTyping(text) {
-            return text.match(/(\s+|[^\s]+)/g) || [];
-        }
-
-        function pinMessageNearTop(chat, messageEl, topOffset = 6) {
-            if (!chat || !messageEl) return;
-
-            const targetTop = Math.max(messageEl.offsetTop - topOffset, 0);
-            chat.scrollTop = targetTop;
-        }
-
 
         async function ask() {
 
@@ -1156,11 +1016,12 @@
 
 
             const chat = document.getElementById("chat");
+
             let userDiv = document.createElement("div");
             userDiv.className = "message user";
             userDiv.innerText = q;
             chat.appendChild(userDiv);
-            pinMessageNearTop(chat, userDiv);
+            chat.scrollTop = chat.scrollHeight;
 
             document.getElementById("question").value = "";
             document.getElementById("question").style.height = 'auto';
@@ -1177,7 +1038,7 @@
                 <div style="color:#aeb6c2; font-style: italic;">berpikir...</div>
             `;
             chat.appendChild(thinkingDiv);
-            pinMessageNearTop(chat, userDiv);
+            chat.scrollTop = chat.scrollHeight;
 
             let dots = 0;
 
@@ -1207,77 +1068,30 @@
                 }
 
                 let ansContainer = document.createElement("div");
-                ansContainer.className = "message pakdahlan answer-message";
-                ansContainer.innerHTML = `
-                    <img class="ai-avatar" src="/static/icon_tanya_dis.png" alt="Avatar">
-                    <div class="answer-bubble is-typing">
-                        <div class="ans-text"></div>
-                        <div class="typing-fade"></div>
-                    </div>
-                `;
+                ansContainer.className = "message pakdahlan";
+                ansContainer.innerHTML = '<img class="ai-avatar" src="/static/icon_tanya_dis.png" alt="Avatar"> <div class="ans-text"></div>';
                 chat.appendChild(ansContainer);
 
-                const answerBubble = ansContainer.querySelector(".answer-bubble");
-                const target = ansContainer.querySelector(".ans-text");
+                let text = data.answer || "Maaf, jawaban belum tersedia.";
+                let target = ansContainer.querySelector(".ans-text");
 
-                let text = (data.answer || "Maaf, jawaban belum tersedia.")
-                    .replace(/\r/g, "")
-                    .replace(/^\s+|\s+$/g, "")
-                    .replace(/\n+/g, " ")
-                    .replace(/\s{2,}/g, " ");
-                const parts = splitTextForTyping(text);
-
-                let index = 0;
-                let typingDelay = 28;
-                let userReadingMode = false;
-
-                pinMessageNearTop(chat, userDiv);
-
-                const handleManualScroll = () => {
-                    if (!isNearBottom(chat, 120)) {
-                        userReadingMode = true;
-                    }
-                };
-
-                chat.addEventListener("scroll", handleManualScroll, { passive: true });
-
-                function finishTyping() {
-                    answerBubble.classList.remove("is-typing");
-                    chat.removeEventListener("scroll", handleManualScroll);
-                    resetWakeLockTimer();
-                }
+                let i = 0;
+                let speed = 10;
 
                 function typeWriter() {
-                    if (index >= parts.length) {
-                        finishTyping();
-                        return;
-                    }
+                    if (i < text.length) {
+                        target.innerText += text.charAt(i);
+                        i++;
+                        chat.scrollTop = chat.scrollHeight;
 
-                    target.textContent += parts[index];
-                    index++;
+                        if (i % 40 === 0) {
+                            resetWakeLockTimer();
+                        }
 
-                    if (index === 1) {
-                        pinMessageNearTop(chat, userDiv);
-                    } else if (!userReadingMode && index % 6 === 0) {
-                        pinMessageNearTop(chat, userDiv);
-                    }
-
-                    
-
-                    if (index % 12 === 0) {
+                        setTimeout(typeWriter, speed);
+                    } else {
                         resetWakeLockTimer();
                     }
-
-                    let delay = typingDelay;
-
-                    const currentPart = parts[index - 1];
-                    if (/[\.\!\?]/.test(currentPart)) {
-                        delay = 90;
-                    } else if (/[,;:]/.test(currentPart)) {
-                        delay = 55;
-                    }
-
-                    setTimeout(typeWriter, delay);
                 }
 
                 typeWriter();
