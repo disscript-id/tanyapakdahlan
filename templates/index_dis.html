@@ -77,7 +77,7 @@
             padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 6px;
             width: 100%;
             max-width: 800px;
             margin: 0 auto;
@@ -125,6 +125,10 @@
             opacity: var(--avatar-opacity);
         }
 
+        .ai-avatar {
+            margin-top: 2px;
+        }
+
         .pakdahlan.answer-message {
             align-items: flex-start;
         }
@@ -134,10 +138,11 @@
             flex: 1;
             min-width: 0;
             padding-right: 4px;
+            margin-top: -2px;
         }
 
         .ans-text {
-            line-height: 1.78;
+            line-height: 1.72;
             color: var(--text-main);
             white-space: pre-wrap;
             word-break: break-word;
@@ -1114,6 +1119,20 @@
             return text.match(/(\s+|[^\s]+)/g) || [];
         }
 
+        function pinMessageNearTop(chat, messageEl, topOffset = 70) {
+            if (!chat || !messageEl) return;
+
+            const chatRect = chat.getBoundingClientRect();
+            const msgRect = messageEl.getBoundingClientRect();
+            const offsetTopInsideChat = msgRect.top - chatRect.top + chat.scrollTop;
+            const topTarget = Math.max(offsetTopInsideChat - topOffset, 0);
+
+            chat.scrollTo({
+                top: topTarget,
+                behavior: "smooth"
+            });
+        }
+
 
         async function ask() {
 
@@ -1146,7 +1165,7 @@
             userDiv.className = "message user";
             userDiv.innerText = q;
             chat.appendChild(userDiv);
-            scrollMessageIntoView(chat, userDiv);
+            pinMessageNearTop(chat, userDiv);
 
             document.getElementById("question").value = "";
             document.getElementById("question").style.height = 'auto';
@@ -1163,7 +1182,7 @@
                 <div style="color:#aeb6c2; font-style: italic;">berpikir...</div>
             `;
             chat.appendChild(thinkingDiv);
-            scrollMessageIntoView(chat, thinkingDiv);
+            pinMessageNearTop(chat, userDiv);
 
             let dots = 0;
 
@@ -1213,7 +1232,7 @@
                 let typingDelay = 28;
                 let userReadingMode = false;
 
-                scrollMessageIntoView(chat, ansContainer);
+                pinMessageNearTop(chat, userDiv);
 
                 const handleManualScroll = () => {
                     if (!isNearBottom(chat, 120)) {
@@ -1239,9 +1258,9 @@
                     index++;
 
                     if (index === 1) {
-                        scrollMessageIntoView(chat, ansContainer);
+                        pinMessageNearTop(chat, userDiv);
                     } else if (!userReadingMode && index % 6 === 0) {
-                        scrollMessageIntoView(chat, ansContainer);
+                        pinMessageNearTop(chat, userDiv);
                     }
 
                     
