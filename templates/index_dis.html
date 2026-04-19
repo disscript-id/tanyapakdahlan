@@ -77,7 +77,7 @@
             padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 2px;
             width: 100%;
             max-width: 800px;
             margin: 0 auto;
@@ -94,10 +94,7 @@
             scrollbar-width: none;
         }
 
-        #chatBottomSpacer {
-            height: 42vh;
-            flex-shrink: 0;
-        }
+        
 
         .message {
             line-height: 1.7;
@@ -143,7 +140,7 @@
             flex: 1;
             min-width: 0;
             padding-right: 4px;
-            margin-top: -2px;
+            margin-top: -6px;
         }
 
         .ans-text {
@@ -768,7 +765,7 @@
             <img class="ai-avatar" src="/static/icon_tanya_dis.png" alt="Avatar">
             <div>Halo! Saya Dahlan Iskan. Ada yang bisa saya bantu hari ini?</div>
         </div>
-        <div id="chatBottomSpacer"></div>
+        
     </div>
 
     <div id="inputSection" class="{% if not logged_in %}blurred-ui{% endif %}">
@@ -1125,18 +1122,11 @@
             return text.match(/(\s+|[^\s]+)/g) || [];
         }
 
-        function pinMessageNearTop(chat, messageEl, topOffset = 92) {
+        function pinMessageNearTop(chat, messageEl, topOffset = 6) {
             if (!chat || !messageEl) return;
 
-            const chatRect = chat.getBoundingClientRect();
-            const msgRect = messageEl.getBoundingClientRect();
-            const offsetTopInsideChat = msgRect.top - chatRect.top + chat.scrollTop;
-            const topTarget = Math.max(offsetTopInsideChat - topOffset, 0);
-
-            chat.scrollTo({
-                top: topTarget,
-                behavior: "smooth"
-            });
+            const targetTop = Math.max(messageEl.offsetTop - topOffset, 0);
+            chat.scrollTop = targetTop;
         }
 
 
@@ -1166,11 +1156,10 @@
 
 
             const chat = document.getElementById("chat");
-            const chatBottomSpacer = document.getElementById("chatBottomSpacer");
             let userDiv = document.createElement("div");
             userDiv.className = "message user";
             userDiv.innerText = q;
-            chat.insertBefore(userDiv, chatBottomSpacer);
+            chat.appendChild(userDiv);
             pinMessageNearTop(chat, userDiv);
 
             document.getElementById("question").value = "";
@@ -1187,7 +1176,7 @@
                 <img class="ai-avatar" src="/static/icon_tanya_dis.png" alt="Avatar">
                 <div style="color:#aeb6c2; font-style: italic;">berpikir...</div>
             `;
-            chat.insertBefore(thinkingDiv, chatBottomSpacer);
+            chat.appendChild(thinkingDiv);
             pinMessageNearTop(chat, userDiv);
 
             let dots = 0;
@@ -1226,14 +1215,16 @@
                         <div class="typing-fade"></div>
                     </div>
                 `;
-                chat.insertBefore(ansContainer, chatBottomSpacer);
+                chat.appendChild(ansContainer);
 
                 const answerBubble = ansContainer.querySelector(".answer-bubble");
                 const target = ansContainer.querySelector(".ans-text");
 
                 let text = (data.answer || "Maaf, jawaban belum tersedia.")
+                    .replace(/\r/g, "")
                     .replace(/^\s+|\s+$/g, "")
-                    .replace(/\n{3,}/g, "\n\n");
+                    .replace(/\n+/g, " ")
+                    .replace(/\s{2,}/g, " ");
                 const parts = splitTextForTyping(text);
 
                 let index = 0;
