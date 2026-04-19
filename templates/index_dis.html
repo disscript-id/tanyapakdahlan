@@ -868,7 +868,7 @@
     <script>
         let wakeLock = null;
         let wakeLockIdleTimer = null;
-        const WAKELOCK_IDLE_MS = 25000; // 25 detik
+        const WAKELOCK_IDLE_MS = 12000; // 12 detik
 
         async function requestScreenWakeLock() {
             try {
@@ -907,7 +907,7 @@
             }
         }
 
-        async function keepScreenAwakeFor25Seconds() {
+        async function keepScreenAwakeFor12Seconds() {
             await requestScreenWakeLock();
 
             if (wakeLockIdleTimer) {
@@ -920,13 +920,13 @@
         }
 
         function resetWakeLockTimer() {
-            keepScreenAwakeFor25Seconds();
+            keepScreenAwakeFor12Seconds();
         }
 
         document.addEventListener('visibilitychange', async function() {
             if (document.visibilityState === 'visible') {
                 if (wakeLockIdleTimer) {
-                    await keepScreenAwakeFor25Seconds();
+                    await keepScreenAwakeFor12Seconds();
                 }
             } else {
                 await releaseScreenWakeLock();
@@ -1006,7 +1006,7 @@
             let q = document.getElementById("question").value.trim();
             if (!q) return;
 
-            await keepScreenAwakeFor25Seconds();
+            await keepScreenAwakeFor12Seconds();
 
 
             document.getElementById("question").blur();
@@ -1060,7 +1060,7 @@
                 });
 
                 let data = await res.json();
-                await keepScreenAwakeFor25Seconds();
+                await keepScreenAwakeFor12Seconds();
 
                 if (thinkingDiv.parentNode) {
                     clearInterval(interval);
