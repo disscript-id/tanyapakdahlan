@@ -742,7 +742,7 @@
         <img class="header-logo" src="/static/icon_tanya_pak_dahlan.png" alt="Logo">
         <div class="header-right">
             {% if logged_in %}
-                <span class="user-greeting">Halo, <strong>{{ user_name }}</strong></span>
+                <span class="user-greeting">Hi, <strong>{{ user_name }}</strong></span>
                 <a href="/logout">Logout</a>
             {% else %}
                 <span style="color:#cfcfcf;">Program uji coba terbatas</span>
@@ -1220,7 +1220,30 @@ function switchBetweenCards(fromId, toId, direction = 'left') {
             }
         });
 
-        async function ask() {
+        
+function placeUserMessageAtTop(chat, el) {
+    const lineHeight = 22; // approx line height
+    const maxVisible = lineHeight * 3;
+
+    const rect = el.getBoundingClientRect();
+    const chatRect = chat.getBoundingClientRect();
+
+    let offset = rect.top - chatRect.top;
+
+    let targetScroll = chat.scrollTop + offset;
+
+    if (el.offsetHeight > maxVisible) {
+        targetScroll += (el.offsetHeight - maxVisible);
+    }
+
+    chat.scrollTo({
+        top: targetScroll,
+        behavior: "smooth"
+    });
+}
+
+
+async function ask() {
 
                 if (!isMobileBrowser()) {
                     showDesktopBlockNotice();
@@ -1251,7 +1274,7 @@ function switchBetweenCards(fromId, toId, direction = 'left') {
             userDiv.className = "message user";
             userDiv.innerText = q;
             chat.appendChild(userDiv);
-            chat.scrollTop = chat.scrollHeight;
+            placeUserMessageAtTop(chat, userDiv);
 
             document.getElementById("question").value = "";
             document.getElementById("question").style.height = 'auto';
@@ -1268,7 +1291,6 @@ function switchBetweenCards(fromId, toId, direction = 'left') {
                 <div style="color:#aeb6c2; font-style: italic;">berpikir...</div>
             `;
             chat.appendChild(thinkingDiv);
-            chat.scrollTop = chat.scrollHeight;
 
             let dots = 0;
 
@@ -1312,7 +1334,7 @@ function switchBetweenCards(fromId, toId, direction = 'left') {
                     if (i < text.length) {
                         target.innerText += text.charAt(i);
                         i++;
-                        chat.scrollTop = chat.scrollHeight;
+                        // removed auto scroll
 
                         if (i % 40 === 0) {
                             resetWakeLockTimer();
