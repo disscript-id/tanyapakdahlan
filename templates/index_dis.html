@@ -1278,23 +1278,18 @@ function getUserBubbleTwoLineLockScroll(chat, userEl, topOffset = 10) {
 
 
 
-function keepAnswerVisible(chat, userEl, answerEl, topOffset = 10, bottomSafe = 24) {
-    if (!chat || !userEl || !answerEl) return;
+function getUserBubbleTwoLineLockScroll(chat, userEl, topOffset = 10) {
+    if (!chat || !userEl) return 0;
 
-    const answerBottom = answerEl.offsetTop + answerEl.offsetHeight;
-    const viewportBottom = chat.scrollTop + chat.clientHeight;
+    const totalHeight = userEl.offsetHeight;
 
-    if (hasUserBubbleHitTop(chat, userEl, topOffset)) {
-        const lockedScroll = Math.max(0, userEl.offsetTop - topOffset);
-        chat.scrollTop = lockedScroll;
-        return;
-    }
+    // kira-kira tinggi 2 baris = 30% dari bubble
+    const visibleBottomPart = totalHeight * 0.50;
 
-    if (answerBottom + bottomSafe > viewportBottom) {
-        const needScroll = answerBottom + bottomSafe - chat.clientHeight;
-        const maxAllowedScroll = Math.max(0, userEl.offsetTop - topOffset);
-        chat.scrollTop = Math.min(needScroll, maxAllowedScroll);
-    }
+    const lockPoint =
+        userEl.offsetTop + totalHeight - visibleBottomPart - topOffset;
+
+    return Math.max(0, lockPoint);
 }
 
 function pinComposerTopThenTrackAnswer(chat, userEl, answerEl) {
