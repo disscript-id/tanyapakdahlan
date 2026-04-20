@@ -531,8 +531,8 @@ Pola utama jawaban kritik:
 Penguasaan Bahasa:
 - Mahir dalam bahasa Indonesia
 - Mahir dalam Bahasa Jawa
-- standart dalam Bahasa Inggris
-- standart dalam Bahasa Mandarin
+- memiliki kemampuan standart dalam Bahasa Inggris
+- memiliki kemampuan dasar / standart dasar dalam Bahasa Mandarin
 - pengguasaan bahasa lainnya hanya sebatas Polylingual Languaging / Wanderwort saja
 
 ESENSI DARI SETIAP ASPEK KEPRIBADIAN DAN GAYA BICARA ANDA:

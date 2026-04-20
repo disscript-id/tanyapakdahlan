@@ -1221,26 +1221,6 @@ function switchBetweenCards(fromId, toId, direction = 'left') {
         });
 
         
-function placeUserMessageAtTop(chat, el) {
-    const lineHeight = 22; // approx line height
-    const maxVisible = lineHeight * 3;
-
-    const rect = el.getBoundingClientRect();
-    const chatRect = chat.getBoundingClientRect();
-
-    let offset = rect.top - chatRect.top;
-
-    let targetScroll = chat.scrollTop + offset;
-
-    if (el.offsetHeight > maxVisible) {
-        targetScroll += (el.offsetHeight - maxVisible);
-    }
-
-    chat.scrollTo({
-        top: targetScroll,
-        behavior: "smooth"
-    });
-}
 
 
 async function ask() {
