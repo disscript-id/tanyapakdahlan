@@ -1260,16 +1260,29 @@ function scrollChatToMessageTop(chat, el, offset = 10) {
     });
 }
 
+function hasUserBubbleHitTop(chat, userEl, topOffset = 10) {
+    if (!chat || !userEl) return false;
+
+    const currentTopInView = userEl.offsetTop - chat.scrollTop;
+    return currentTopInView <= topOffset;
+}
+
 function keepAnswerVisible(chat, userEl, answerEl, topOffset = 10, bottomSafe = 24) {
     if (!chat || !userEl || !answerEl) return;
 
-    const userTopTarget = Math.max(0, userEl.offsetTop - topOffset);
     const answerBottom = answerEl.offsetTop + answerEl.offsetHeight;
     const viewportBottom = chat.scrollTop + chat.clientHeight;
 
+    if (hasUserBubbleHitTop(chat, userEl, topOffset)) {
+        const lockedScroll = Math.max(0, userEl.offsetTop - topOffset);
+        chat.scrollTop = lockedScroll;
+        return;
+    }
+
     if (answerBottom + bottomSafe > viewportBottom) {
         const needScroll = answerBottom + bottomSafe - chat.clientHeight;
-        chat.scrollTop = Math.max(userTopTarget, needScroll);
+        const maxAllowedScroll = Math.max(0, userEl.offsetTop - topOffset);
+        chat.scrollTop = Math.min(needScroll, maxAllowedScroll);
     }
 }
 
