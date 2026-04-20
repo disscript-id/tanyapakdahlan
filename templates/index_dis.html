@@ -1325,7 +1325,9 @@ async function ask() {
                 ansContainer.innerHTML = '<img class="ai-avatar" src="/static/icon_tanya_dis.png" alt="Avatar"> <div class="ans-text"></div>';
                 chat.appendChild(ansContainer);
                 
-                placeUserMessageAtTop(chat, userDiv);
+                requestAnimationFrame(() => {
+                    placeUserMessageAtTop(chat, userDiv);
+                });
 
 
                 let text = data.answer || "Maaf, jawaban belum tersedia.";
