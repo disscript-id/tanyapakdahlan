@@ -71,17 +71,35 @@
             text-decoration: none;
         }
 
+        #chatShell {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        #chatViewport {
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
         #chat {
             flex: 1;
+            min-height: 0;
             overflow-y: auto;
-            padding: 16px;
+            overflow-x: hidden;
+            padding: 16px 16px 10px;
             display: flex;
             flex-direction: column;
             gap: 20px;
             width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            overflow-x: hidden;
+            margin: 0;
             transition: filter 0.3s ease, opacity 0.3s ease;
         }
 
@@ -133,14 +151,15 @@
         }
 
         #inputSection {
-            width: calc(100% - 34px);
-            max-width: 730px;
-            margin: 0 auto;
-            padding: 10px 12px;
+            width: 100%;
+            max-width: none;
+            margin: 0;
+            padding: 10px 12px 12px;
             background: rgba(16,17,20,0.88);
-            position: sticky;
-            bottom: 0;
-            margin-bottom: -10px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            position: relative;
+            bottom: auto;
+            margin-bottom: 0;
             transition:
                 filter 0.3s ease,
                 opacity 0.3s ease,
@@ -148,10 +167,10 @@
                 max-width 0.28s ease,
                 transform 0.28s ease;
         }
-
+        
         #inputSection.input-active {
-            width: calc(100% - 24px);
-            max-width: 800px;
+            width: 100%;
+            max-width: none;
         }
 
         #inputContainer {
@@ -658,13 +677,13 @@
             }
 
             #inputSection {
-                width: calc(100% - 26px);
-                max-width: 100%;
+                width: 100%;
+                max-width: none;
             }
 
             #inputSection.input-active {
-                width: calc(100% - 14px);
-                max-width: 100%;
+                width: 100%;
+                max-width: none;
             }
 
             .overlay-card {
@@ -755,26 +774,31 @@
         </div>
     </div>
 
-    <div id="chat" class="{% if not logged_in %}blurred-ui{% endif %}">
-        
-        <div class="message pakdahlan">
-            <img class="ai-avatar" src="/static/icon_tanya_dis.png" alt="Avatar">
-            <div class="intro-text">Halo! Saya Dahlan Iskan..</div>
+    <div id="chatShell" class="{% if not logged_in %}blurred-ui{% endif %}">
+        <div id="chatViewport">
+            <div id="chat">
+                
+                <div class="message pakdahlan">
+                    <img class="ai-avatar" src="/static/icon_tanya_dis.png" alt="Avatar">
+                    <div class="intro-text">Halo! Saya Dahlan Iskan..</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="inputSection">
+            <div id="inputContainer">
+                <textarea id="question" rows="1" placeholder="Tanya sesuatu..." oninput="this.style.height='';this.style.height=this.scrollHeight + 'px'"></textarea>
+                <button id="askBtn" onclick="ask()">
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+                </button>
+            </div>
+            <div class="desc">
+                Tanya Pak Dahlan adalah fitur AI. Namanya juga mesin, kadang bisa keliru.
+            </div>
+            <a href="#" class="feedback" onclick="openFeedbackModal(event)">Kirim Masukan</a>
         </div>
     </div>
 
-    <div id="inputSection" class="{% if not logged_in %}blurred-ui{% endif %}">
-        <div id="inputContainer">
-            <textarea id="question" rows="1" placeholder="Tanya sesuatu..." oninput="this.style.height='';this.style.height=this.scrollHeight + 'px'"></textarea>
-            <button id="askBtn" onclick="ask()">
-                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
-            </button>
-        </div>
-        <div class="desc">
-            Tanya Pak Dahlan adalah fitur AI. Namanya juga mesin, kadang bisa keliru.
-        </div>
-        <a href="#" class="feedback" onclick="openFeedbackModal(event)">Kirim Masukan</a>
-    </div>
 
     <div id="footer" class="{% if not logged_in %}blurred-ui{% endif %}">
         <div class="collab-text">DIS Script Technology kolaborasi dengan SMKN 2 Kota Mojokerto</div>
@@ -1225,17 +1249,10 @@ function switchBetweenCards(fromId, toId, direction = 'left') {
             }
         });
 
-function placeUserMessageAtTop(chat, el) {
-    const styles = window.getComputedStyle(el);
-    const lineHeight = parseFloat(styles.lineHeight) || 25.5;
-    const paddingTop = parseFloat(styles.paddingTop) || 0;
-    const paddingBottom = parseFloat(styles.paddingBottom) || 0;
+function scrollChatToMessageTop(chat, el, offset = 10) {
+    if (!chat || !el) return;
 
-    const visibleHeight = (lineHeight * 3) + paddingTop + paddingBottom;
-
-    const targetTop = el.offsetTop;
-    const extraHidden = Math.max(0, el.offsetHeight - visibleHeight);
-    const targetScroll = targetTop + extraHidden;
+    const targetScroll = Math.max(0, el.offsetTop - offset);
 
     chat.scrollTo({
         top: targetScroll,
@@ -1243,6 +1260,28 @@ function placeUserMessageAtTop(chat, el) {
     });
 }
 
+function keepAnswerVisible(chat, userEl, answerEl, topOffset = 10, bottomSafe = 24) {
+    if (!chat || !userEl || !answerEl) return;
+
+    const userTopTarget = Math.max(0, userEl.offsetTop - topOffset);
+    const answerBottom = answerEl.offsetTop + answerEl.offsetHeight;
+    const viewportBottom = chat.scrollTop + chat.clientHeight;
+
+    if (answerBottom + bottomSafe > viewportBottom) {
+        const needScroll = answerBottom + bottomSafe - chat.clientHeight;
+        chat.scrollTop = Math.max(userTopTarget, needScroll);
+    }
+}
+
+function pinComposerTopThenTrackAnswer(chat, userEl, answerEl) {
+    if (!chat || !userEl || !answerEl) return;
+
+    scrollChatToMessageTop(chat, userEl, 10);
+
+    requestAnimationFrame(() => {
+        keepAnswerVisible(chat, userEl, answerEl, 10, 24);
+    });
+}
 
 async function ask() {
 
@@ -1275,6 +1314,10 @@ async function ask() {
             userDiv.className = "message user";
             userDiv.innerText = q;
             chat.appendChild(userDiv);
+
+            requestAnimationFrame(() => {
+                scrollChatToMessageTop(chat, userDiv, 10);
+            });
             
 
             document.getElementById("question").value = "";
@@ -1324,9 +1367,9 @@ async function ask() {
                 ansContainer.className = "message pakdahlan";
                 ansContainer.innerHTML = '<img class="ai-avatar" src="/static/icon_tanya_dis.png" alt="Avatar"> <div class="ans-text"></div>';
                 chat.appendChild(ansContainer);
-                
+
                 requestAnimationFrame(() => {
-                    placeUserMessageAtTop(chat, userDiv);
+                    pinComposerTopThenTrackAnswer(chat, userDiv, ansContainer);
                 });
 
 
@@ -1340,7 +1383,10 @@ async function ask() {
                     if (i < text.length) {
                         target.innerText += text.charAt(i);
                         i++;
-                        // removed auto scroll
+
+                        if (i % 3 === 0) {
+                            keepAnswerVisible(chat, userDiv, ansContainer, 10, 24);
+                        }
 
                         if (i % 40 === 0) {
                             resetWakeLockTimer();
@@ -1348,6 +1394,7 @@ async function ask() {
 
                         setTimeout(typeWriter, speed);
                     } else {
+                        keepAnswerVisible(chat, userDiv, ansContainer, 10, 24);
                         resetWakeLockTimer();
                     }
                 }
