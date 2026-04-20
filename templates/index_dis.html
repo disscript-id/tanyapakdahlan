@@ -238,6 +238,11 @@
             opacity: 0.8;
         }
 
+        .logo-disway {
+            height: 14px; /* sesuaikan: 14px / 12px / 10px */
+        }
+
+
         .blurred-ui {
             filter: blur(0.9px) brightness(0.90);
             pointer-events: none;
@@ -776,7 +781,7 @@
         <div class="logo-container">
             <img class="logo-img" src="/static/logodisscriptputih.png" alt="DIS Script">
             <img class="logo-img" src="/static/logo_smk_putih.png" alt="SMKN 2">
-            <img class="logo-img" src="/static/logo_disway_putih.png" alt="DISWAY">
+            <img class="logo-img logo-disway" src="/static/logo_disway_putih.png" alt="DISWAY">
         </div>
     </div>
 
@@ -1270,7 +1275,7 @@ async function ask() {
             userDiv.className = "message user";
             userDiv.innerText = q;
             chat.appendChild(userDiv);
-            placeUserMessageAtTop(chat, userDiv);
+            
 
             document.getElementById("question").value = "";
             document.getElementById("question").style.height = 'auto';
@@ -1319,6 +1324,9 @@ async function ask() {
                 ansContainer.className = "message pakdahlan";
                 ansContainer.innerHTML = '<img class="ai-avatar" src="/static/icon_tanya_dis.png" alt="Avatar"> <div class="ans-text"></div>';
                 chat.appendChild(ansContainer);
+                
+                placeUserMessageAtTop(chat, userDiv);
+
 
                 let text = data.answer || "Maaf, jawaban belum tersedia.";
                 let target = ansContainer.querySelector(".ans-text");
