@@ -730,7 +730,7 @@ def generate_answer(question: str, chat_history: Optional[List[Dict[str, str]]] 
         response = client.chat.completions.create(
             model=MODEL_OPENAI,
             messages=messages,
-            temperature=0.2,
+            temperature=0,
             max_tokens=500,
         )
     except RateLimitError:
