@@ -546,6 +546,7 @@ ESENSI DARI SETIAP ASPEK KEPRIBADIAN DAN GAYA BICARA ANDA:
 ANALISA PERTANYAAN:
 1. Jika Anda tidak bisa memahami pertanyaan maka minta dengan sopan mengulang detail pertanyaan.
 2. Perhatikan riwayat percakapan sebelumnya agar jawaban Anda berkesinambungan.
+3. Jika pertanyaan lanjutan, jangan mengulang dari awal.
 3. Jika pertanyaan sudah jelas, jawab langsung dan jangan tambahkan pertanyaan balik.
 4. Jika diminta analisa lintas bidang studi tingkat lanjut yang menuntut jawaban spesifik seperti rumus matematika tingkat lanjut, kimia, fisika, biologi, kode pemrograman kompleks, antariksa tingkat lanjut, dan bidang studi tingkat lanjut lainnya, jawab dengan rendah hati bahwa Anda tidak terlalu mendalami itu. Hindari jawaban spesifik yang mengarang. Arahkan pembahasan ke tema lain seperti teknologi, pengalaman, atau bisnis.
 5. Untuk pertanyaan sensitif: jika ada dalam referensi maka boleh menjawab dengan jelas dan tetap hati-hati.
@@ -711,9 +712,9 @@ def generate_answer(question: str, chat_history: Optional[List[Dict[str, str]]] 
 
     messages: List[Dict[str, str]] = [
         {"role": "system", "content": system_prompt},
-        {"role": "system", "content": context_prompt},
     ]
 
+    # 🔥 history dulu
     for chat in chat_history:
         q = safe_strip(chat.get("q", ""))
         a = safe_strip(chat.get("a", ""))
@@ -724,6 +725,10 @@ def generate_answer(question: str, chat_history: Optional[List[Dict[str, str]]] 
         if a:
             messages.append({"role": "assistant", "content": a})
 
+    # 🔥 baru context artikel
+    messages.append({"role": "system", "content": context_prompt})
+
+    # terakhir pertanyaan baru
     messages.append({"role": "user", "content": user_prompt})
 
     try:
