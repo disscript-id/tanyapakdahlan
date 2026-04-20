@@ -1268,7 +1268,7 @@ function getUserBubbleTwoLineLockScroll(chat, userEl, topOffset = 10) {
     const paddingTop = parseFloat(styles.paddingTop) || 0;
     const paddingBottom = parseFloat(styles.paddingBottom) || 0;
 
-    const visibleBottomPart = userEl.offsetHeight * 0.38;
+    const visibleBottomPart = (lineHeight * 3) + paddingTop + paddingBottom;
 
     const maxScrollBeforeHideTooMuch =
         userEl.offsetTop + userEl.offsetHeight - visibleBottomPart - topOffset;
