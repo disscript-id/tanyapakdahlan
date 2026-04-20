@@ -1263,15 +1263,17 @@ function scrollChatToMessageTop(chat, el, offset = 10) {
 function getUserBubbleTwoLineLockScroll(chat, userEl, topOffset = 10) {
     if (!chat || !userEl) return 0;
 
-    const totalHeight = userEl.offsetHeight;
+    const styles = window.getComputedStyle(userEl);
+    const lineHeight = parseFloat(styles.lineHeight) || 25.5;
+    const paddingTop = parseFloat(styles.paddingTop) || 0;
+    const paddingBottom = parseFloat(styles.paddingBottom) || 0;
 
-    // kira-kira tinggi 2 baris = 30% dari bubble
-    const visibleBottomPart = totalHeight * 0.32;
+    const visibleBottomPart = (lineHeight * 2) + paddingTop + paddingBottom;
 
-    const lockPoint =
-        userEl.offsetTop + totalHeight - visibleBottomPart - topOffset;
+    const maxScrollBeforeHideTooMuch =
+        userEl.offsetTop + userEl.offsetHeight - visibleBottomPart - topOffset;
 
-    return Math.max(0, lockPoint);
+    return Math.max(0, maxScrollBeforeHideTooMuch);
 }
 
 
@@ -1282,13 +1284,16 @@ function keepAnswerVisible(chat, userEl, answerEl, topOffset = 10, bottomSafe = 
     const answerBottom = answerEl.offsetTop + answerEl.offsetHeight;
     const viewportBottom = chat.scrollTop + chat.clientHeight;
 
-    const needScroll = answerBottom + bottomSafe - chat.clientHeight;
-    const lockScroll = getUserBubbleTwoLineLockScroll(chat, userEl, topOffset);
+    if (hasUserBubbleHitTop(chat, userEl, topOffset)) {
+        const lockedScroll = Math.max(0, userEl.offsetTop - topOffset);
+        chat.scrollTop = lockedScroll;
+        return;
+    }
 
     if (answerBottom + bottomSafe > viewportBottom) {
-        chat.scrollTop = Math.min(needScroll, lockScroll);
-    } else if (chat.scrollTop > lockScroll) {
-        chat.scrollTop = lockScroll;
+        const needScroll = answerBottom + bottomSafe - chat.clientHeight;
+        const maxAllowedScroll = Math.max(0, userEl.offsetTop - topOffset);
+        chat.scrollTop = Math.min(needScroll, maxAllowedScroll);
     }
 }
 
