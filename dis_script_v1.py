@@ -24,8 +24,8 @@ load_dotenv()
 MODEL_OPENAI = os.getenv("MODEL_OPENAI", "gpt-4o-mini")
 EMBED_MODEL = os.getenv("EMBED_MODEL", "text-embedding-3-small")
 
-TOP_K = int(os.getenv("TOP_K", "5"))
-SIM_THRESHOLD = float(os.getenv("SIM_THRESHOLD", "0.15"))
+TOP_K = int(os.getenv("TOP_K", "3"))
+SIM_THRESHOLD = float(os.getenv("SIM_THRESHOLD", "0.4"))
 MAX_CONTEXT_CHARS = int(os.getenv("MAX_CONTEXT_CHARS", "1800"))
 MAX_CANDIDATES_TO_SCAN = int(os.getenv("MAX_CANDIDATES_TO_SCAN", "8"))
 DOMINANT_TITLE_MIN_COUNT = int(os.getenv("DOMINANT_TITLE_MIN_COUNT", "3"))
@@ -643,6 +643,14 @@ def generate_answer(question: str, chat_history: Optional[List[Dict[str, str]]] 
 
     try:
         results = search_paragraph(question)
+
+        # pengaman anti-halusinasi
+        if not results:
+            return fallback_no_reference_answer(
+                question,
+                is_time_question(question)
+            )
+
     except Exception as exc:
         logger.exception("Retrieval gagal.")
         return (
