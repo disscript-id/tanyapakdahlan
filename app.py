@@ -1333,7 +1333,7 @@ def ask():
         session["chat_history"] = []
 
     chat_history = session["chat_history"]
-    recent_history = chat_history[-6:]
+    recent_history = chat_history[-10:]
 
     time.sleep(0.5)
 
@@ -1344,7 +1344,7 @@ def ask():
     response_time = int((end_time - start_time) * 1000)
 
     chat_history.append({"q": question, "a": answer})
-    session["chat_history"] = chat_history[-12:]
+    session["chat_history"] = chat_history[-16:]
     session.modified = True
 
     mood = classify_mood(question)
