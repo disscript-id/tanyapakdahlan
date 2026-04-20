@@ -1220,7 +1220,23 @@ function switchBetweenCards(fromId, toId, direction = 'left') {
             }
         });
 
-        
+function placeUserMessageAtTop(chat, el) {
+    const styles = window.getComputedStyle(el);
+    const lineHeight = parseFloat(styles.lineHeight) || 25.5;
+    const paddingTop = parseFloat(styles.paddingTop) || 0;
+    const paddingBottom = parseFloat(styles.paddingBottom) || 0;
+
+    const visibleHeight = (lineHeight * 3) + paddingTop + paddingBottom;
+
+    const targetTop = el.offsetTop;
+    const extraHidden = Math.max(0, el.offsetHeight - visibleHeight);
+    const targetScroll = targetTop + extraHidden;
+
+    chat.scrollTo({
+        top: targetScroll,
+        behavior: "smooth"
+    });
+}
 
 
 async function ask() {
