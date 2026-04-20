@@ -1284,16 +1284,13 @@ function keepAnswerVisible(chat, userEl, answerEl, topOffset = 10, bottomSafe = 
     const answerBottom = answerEl.offsetTop + answerEl.offsetHeight;
     const viewportBottom = chat.scrollTop + chat.clientHeight;
 
-    if (hasUserBubbleHitTop(chat, userEl, topOffset)) {
-        const lockedScroll = Math.max(0, userEl.offsetTop - topOffset);
-        chat.scrollTop = lockedScroll;
-        return;
-    }
+    const needScroll = answerBottom + bottomSafe - chat.clientHeight;
+    const lockScroll = getUserBubbleTwoLineLockScroll(chat, userEl, topOffset);
 
     if (answerBottom + bottomSafe > viewportBottom) {
-        const needScroll = answerBottom + bottomSafe - chat.clientHeight;
-        const maxAllowedScroll = Math.max(0, userEl.offsetTop - topOffset);
-        chat.scrollTop = Math.min(needScroll, maxAllowedScroll);
+        chat.scrollTop = Math.min(needScroll, lockScroll);
+    } else if (chat.scrollTop > lockScroll) {
+        chat.scrollTop = lockScroll;
     }
 }
 
