@@ -1277,14 +1277,13 @@ function getUserBubbleTwoLineLockScroll(chat, userEl, topOffset = 10) {
 }
 
 
-
 function getUserBubbleTwoLineLockScroll(chat, userEl, topOffset = 10) {
     if (!chat || !userEl) return 0;
 
     const totalHeight = userEl.offsetHeight;
 
     // kira-kira tinggi 2 baris = 30% dari bubble
-    const visibleBottomPart = totalHeight * 0.50;
+    const visibleBottomPart = totalHeight * 0.32;
 
     const lockPoint =
         userEl.offsetTop + totalHeight - visibleBottomPart - topOffset;
