@@ -1,5 +1,6 @@
 import os
 import json
+import re
 
 INPUT_FOLDER = "corpus_txt"
 OUTPUT_FILE = "data_chunks/chunks.jsonl"
@@ -45,6 +46,37 @@ def parse_file(filepath):
     metadata["KONTEKS_FULL"] = " ".join(context_lines).strip()
 
     return metadata, article_text.strip()
+
+def clean_penutup_artikel(text, max_tail_chars=28):
+    text = safe_text(text)
+    if not text:
+        return ""
+
+    tail_len = min(max_tail_chars, len(text))
+    start_tail = len(text) - tail_len
+    tail = text[start_tail:]
+
+    tail_lower = tail.lower()
+
+    kandidat = []
+
+    for marker in ["dis", "dahlan", "("]:
+        pos = tail_lower.find(marker)
+        if pos != -1:
+            kandidat.append(pos)
+
+    if not kandidat:
+        return text.strip()
+
+    cut_pos_in_tail = min(kandidat)
+    cut_pos_in_text = start_tail + cut_pos_in_tail
+
+    hasil = text[:cut_pos_in_text].rstrip()
+
+    # rapikan sisa tanda baca / spasi di ujung
+    hasil = re.sub(r"[ \t]+$", "", hasil)
+    return hasil.strip()
+
 
 
 def chunk_text(text, max_chars=1100, overlap_paragraphs=2):
@@ -168,6 +200,7 @@ def main():
 
         path = os.path.join(INPUT_FOLDER, file)
         meta, article = parse_file(path)
+        article = clean_penutup_artikel(article, max_tail_chars=28)
 
         if not article.strip():
             print(f"⚠️ Lewati file tanpa isi artikel: {file}")
