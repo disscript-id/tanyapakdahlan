@@ -722,10 +722,10 @@ def generate_answer(question: str, chat_history: Optional[List[Dict[str, str]]] 
 
     messages: List[Dict[str, str]] = [
         {"role": "system", "content": system_prompt},
+        {"role": "system", "content": context_prompt},
     ]
 
-    # 🔥 history dulu
-    for chat in chat_history:
+    for chat in chat_history[-4:]:
         q = safe_strip(chat.get("q", ""))
         a = safe_strip(chat.get("a", ""))
 
@@ -735,10 +735,6 @@ def generate_answer(question: str, chat_history: Optional[List[Dict[str, str]]] 
         if a:
             messages.append({"role": "assistant", "content": a})
 
-    # 🔥 baru context artikel
-    messages.append({"role": "system", "content": context_prompt})
-
-    # terakhir pertanyaan baru
     messages.append({"role": "user", "content": user_prompt})
 
     try:
@@ -801,6 +797,8 @@ def generate_answer(question: str, chat_history: Optional[List[Dict[str, str]]] 
 def main() -> int:
     print("\nTanya Pak Dahlan siap. Ketik 'exit' untuk keluar.\n")
 
+    chat_history = []
+
     while True:
         try:
             q = input("Pertanyaan: ").strip()
@@ -816,8 +814,18 @@ def main() -> int:
             print("\nSampai jumpa.\n")
             return 0
 
+        answer = generate_answer(q, chat_history)
+
+        chat_history.append({
+            "q": q,
+            "a": answer
+        })
+
+        if len(chat_history) > 6:
+            chat_history = chat_history[-6:]
+
         print("\nJawaban:\n")
-        print(generate_answer(q))
+        print(answer)
         print("\n-------------------\n")
 
 
