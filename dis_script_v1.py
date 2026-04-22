@@ -24,7 +24,7 @@ load_dotenv()
 MODEL_OPENAI = os.getenv("MODEL_OPENAI", "gpt-4o-mini")
 EMBED_MODEL = os.getenv("EMBED_MODEL", "text-embedding-3-small")
 
-TOP_K = int(os.getenv("TOP_K", "6"))
+TOP_K = int(os.getenv("TOP_K", "5"))
 SIM_THRESHOLD = float(os.getenv("SIM_THRESHOLD", "0.15"))
 MAX_CONTEXT_CHARS = int(os.getenv("MAX_CONTEXT_CHARS", "1800"))
 MAX_CANDIDATES_TO_SCAN = int(os.getenv("MAX_CANDIDATES_TO_SCAN", "8"))
@@ -129,40 +129,6 @@ def is_time_question(q: str) -> bool:
         "pada",
     ]
     return any(k in q for k in keywords)
-
-
-def is_followup_question(question: str, chat_history: Optional[List[Dict[str, str]]] = None) -> bool:
-    q = safe_strip(question).lower()
-    if not q:
-        return False
-
-    if not chat_history:
-        return False
-
-    followup_phrases = {
-        "lalu", "terus", "jadi", "maksudnya", "kenapa", "mengapa",
-        "kok", "gimana", "bagaimana", "lanjut", "lanjutnya",
-        "terus?", "lalu?", "jadi?", "maksudnya?", "kenapa?", "kok?",
-        "apa maksudnya", "apa artinya", "yang itu", "itu maksudnya",
-        "trus", "trus?", "lantas", "lalu gimana", "terus gimana"
-    }
-
-    if q in followup_phrases:
-        return True
-
-    short_followup_starters = (
-        "jadi", "lalu", "terus", "kenapa", "mengapa", "maksudnya",
-        "kok", "trus", "lantas"
-    )
-
-    if len(q.split()) <= 5 and any(q.startswith(starter) for starter in short_followup_starters):
-        return True
-
-    pronoun_markers = ("itu", "dia", "beliau", "mereka", "hal itu", "yang tadi", "yang itu")
-    if len(q.split()) <= 6 and any(marker in q for marker in pronoun_markers):
-        return True
-
-    return False
 
 
 def safe_strip(value: Any) -> str:
@@ -591,7 +557,6 @@ DATA KELUARGA:
 - user memiliki banyak sebutan untuk memanggil anda, misal: pak, bapak, pak dahlan, pak dis, abah, pak dahlan iskan, pak iskan.
 - nama menantu perempuan: "Ivo" adalah istri dari Azrul Ananda. 
 - Nama menantu laki-laki: "Tatang" adalah suami dari Isna Fitriana
-
 {aturan_waktu}
 """.strip()
 
@@ -678,18 +643,8 @@ def generate_answer(question: str, chat_history: Optional[List[Dict[str, str]]] 
     if chat_history is None:
         chat_history = []
 
-    is_followup = is_followup_question(question, chat_history)
-
     try:
         results = search_paragraph(question)
-
-        # pengaman anti-halusinasi
-        if not results:
-            return fallback_no_reference_answer(
-                question,
-                is_time_question(question)
-            )
-
     except Exception as exc:
         logger.exception("Retrieval gagal.")
         return (
@@ -753,25 +708,17 @@ def generate_answer(question: str, chat_history: Optional[List[Dict[str, str]]] 
         is_time=is_time,
     )
 
-    if is_followup:
-        system_prompt += (
-            "\n- Pertanyaan terbaru ini sangat mungkin pertanyaan lanjutan."
-            "\n- Jawab langsung inti lanjutannya tanpa membuka topik baru."
-            "\n- Dahulukan konteks percakapan terakhir daripada membuka ulang dari awal."
-        )
-
     messages: List[Dict[str, str]] = [
         {"role": "system", "content": system_prompt},
         {"role": "system", "content": context_prompt},
     ]
 
-    for chat in chat_history[-4:]:
+    for chat in chat_history:
         q = safe_strip(chat.get("q", ""))
         a = safe_strip(chat.get("a", ""))
 
         if q:
             messages.append({"role": "user", "content": q})
-
         if a:
             messages.append({"role": "assistant", "content": a})
 
@@ -837,8 +784,6 @@ def generate_answer(question: str, chat_history: Optional[List[Dict[str, str]]] 
 def main() -> int:
     print("\nTanya Pak Dahlan siap. Ketik 'exit' untuk keluar.\n")
 
-    chat_history = []
-
     while True:
         try:
             q = input("Pertanyaan: ").strip()
@@ -854,18 +799,8 @@ def main() -> int:
             print("\nSampai jumpa.\n")
             return 0
 
-        answer = generate_answer(q, chat_history)
-
-        chat_history.append({
-            "q": q,
-            "a": answer
-        })
-
-        if len(chat_history) > 6:
-            chat_history = chat_history[-6:]
-
         print("\nJawaban:\n")
-        print(answer)
+        print(generate_answer(q))
         print("\n-------------------\n")
 
 
