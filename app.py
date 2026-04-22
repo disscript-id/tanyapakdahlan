@@ -847,6 +847,24 @@ def reset_db():
 
     return "✅ Database berhasil di-reset"
 
+@app.route("/admin/reset-my-logs")
+def reset_my_logs():
+    if not session.get("admin_logged_in"):
+        return redirect("/admin/login")
+
+    my_phone = "081359991515"  # nomor Anda
+
+    conn = get_db_connection()
+
+    conn.execute("DELETE FROM chat_logs WHERE user_phone = ?", (my_phone,))
+    conn.execute("DELETE FROM user_sessions WHERE user_phone = ?", (my_phone,))
+    conn.execute("DELETE FROM user_feedback WHERE user_phone = ?", (my_phone,))
+
+    conn.commit()
+    conn.close()
+
+    return "✅ Chat logs user 081359991515 berhasil dihapus"
+
 
 # =========================
 # PUBLIC ROUTES
