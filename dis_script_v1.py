@@ -724,7 +724,7 @@ def generate_answer(question: str, chat_history: Optional[List[Dict[str, str]]] 
         {"role": "system", "content": context_prompt},
     ]
 
-    for chat in chat_history[-4:]:
+    for chat in chat_history[-8:]:
         q = safe_strip(chat.get("q", ""))
         a = safe_strip(chat.get("a", ""))
 
@@ -740,7 +740,7 @@ def generate_answer(question: str, chat_history: Optional[List[Dict[str, str]]] 
         response = client.chat.completions.create(
             model=MODEL_OPENAI,
             messages=messages,
-            temperature=0.6,
+            temperature=0,
             max_tokens=500,
         )
     except RateLimitError:
