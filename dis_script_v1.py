@@ -131,6 +131,40 @@ def is_time_question(q: str) -> bool:
     return any(k in q for k in keywords)
 
 
+def is_followup_question(question: str, chat_history: Optional[List[Dict[str, str]]] = None) -> bool:
+    q = safe_strip(question).lower()
+    if not q:
+        return False
+
+    if not chat_history:
+        return False
+
+    followup_phrases = {
+        "lalu", "terus", "jadi", "maksudnya", "kenapa", "mengapa",
+        "kok", "gimana", "bagaimana", "lanjut", "lanjutnya",
+        "terus?", "lalu?", "jadi?", "maksudnya?", "kenapa?", "kok?",
+        "apa maksudnya", "apa artinya", "yang itu", "itu maksudnya",
+        "trus", "trus?", "lantas", "lalu gimana", "terus gimana"
+    }
+
+    if q in followup_phrases:
+        return True
+
+    short_followup_starters = (
+        "jadi", "lalu", "terus", "kenapa", "mengapa", "maksudnya",
+        "kok", "trus", "lantas"
+    )
+
+    if len(q.split()) <= 5 and any(q.startswith(starter) for starter in short_followup_starters):
+        return True
+
+    pronoun_markers = ("itu", "dia", "beliau", "mereka", "hal itu", "yang tadi", "yang itu")
+    if len(q.split()) <= 6 and any(marker in q for marker in pronoun_markers):
+        return True
+
+    return False
+
+
 def safe_strip(value: Any) -> str:
     if value is None:
         return ""
@@ -547,12 +581,15 @@ ANALISA PERTANYAAN:
 1. Jika Anda tidak bisa memahami pertanyaan maka minta dengan sopan mengulang detail pertanyaan.
 2. Perhatikan riwayat percakapan sebelumnya agar jawaban Anda berkesinambungan.
 3. Jika pertanyaan lanjutan, jangan mengulang dari awal.
-3. Jika pertanyaan sudah jelas, jawab langsung dan jangan tambahkan pertanyaan balik.
-4. Jika diminta analisa lintas bidang studi tingkat lanjut yang menuntut jawaban spesifik seperti rumus matematika tingkat lanjut, kimia, fisika, biologi, kode pemrograman kompleks, antariksa tingkat lanjut, dan bidang studi tingkat lanjut lainnya, jawab dengan rendah hati bahwa Anda tidak terlalu mendalami itu. Hindari jawaban spesifik yang mengarang. Arahkan pembahasan ke tema lain seperti teknologi, pengalaman, atau bisnis.
-5. Untuk pertanyaan sensitif: jika ada dalam referensi maka boleh menjawab dengan jelas dan tetap hati-hati.
-6. Pertanyaan matematika dasar dan ilmu tingkat dasar bidang studi lain boleh dijawab.
-7. Tahun yang tampak kuat di referensi terpilih: {tahun_info}.
-8. user memiliki banyak sebutan untuk memanggil anda, misal: pak, bapak, pak dahlan, pak dis, abah, pak dahlan iskan, pak iskan, bos, pak bos.
+4. Jika pengguna bertanya singkat seperti: "lalu?", "terus?", "kenapa?", "maksudnya?", "jadi?", anggap itu lanjutan dari pembicaraan sebelumnya.
+5. Untuk pertanyaan lanjutan, jangan pindah ke topik lain kecuali pengguna memang mengganti topik dengan jelas.
+6. Pertahankan tokoh, peristiwa, dan konteks dari percakapan terakhir sebagai fokus utama jawaban.
+7. Jika pertanyaan sudah jelas, jawab langsung dan jangan tambahkan pertanyaan balik.
+8. Jika diminta analisa lintas bidang studi tingkat lanjut yang menuntut jawaban spesifik seperti rumus matematika tingkat lanjut, kimia, fisika, biologi, kode pemrograman kompleks, antariksa tingkat lanjut, dan bidang studi tingkat lanjut lainnya, jawab dengan rendah hati bahwa Anda tidak terlalu mendalami itu. Hindari jawaban spesifik yang mengarang. Arahkan pembahasan ke tema lain seperti teknologi, pengalaman, atau bisnis.
+9. Untuk pertanyaan sensitif: jika ada dalam referensi maka boleh menjawab dengan jelas dan tetap hati-hati.
+10. Pertanyaan matematika dasar dan ilmu tingkat dasar bidang studi lain boleh dijawab.
+11. Tahun yang tampak kuat di referensi terpilih: {tahun_info}.
+12. user memiliki banyak sebutan untuk memanggil anda, misal: pak, bapak, pak dahlan, pak dis, abah, pak dahlan iskan, pak iskan, bos, pak bos.
 
 DATA KELUARGA:
 - Istri: Ibu rumah tangga, jago masak, perhatian. jika user tidak tanya nama istri maka sebut saja dengan kata ganti: istri saya. jika ada yang tanya nama istri anda, namanya: Nafsiah Sabri
@@ -646,6 +683,8 @@ def generate_answer(question: str, chat_history: Optional[List[Dict[str, str]]] 
     if chat_history is None:
         chat_history = []
 
+    is_followup = is_followup_question(question, chat_history)
+
     try:
         results = search_paragraph(question)
 
@@ -719,12 +758,19 @@ def generate_answer(question: str, chat_history: Optional[List[Dict[str, str]]] 
         is_time=is_time,
     )
 
+    if is_followup:
+        system_prompt += (
+            "\n- Pertanyaan terbaru ini sangat mungkin pertanyaan lanjutan."
+            "\n- Jawab langsung inti lanjutannya tanpa membuka topik baru."
+            "\n- Dahulukan konteks percakapan terakhir daripada membuka ulang dari awal."
+        )
+
     messages: List[Dict[str, str]] = [
         {"role": "system", "content": system_prompt},
         {"role": "system", "content": context_prompt},
     ]
 
-    for chat in chat_history[-8:]:
+    for chat in chat_history[-4:]:
         q = safe_strip(chat.get("q", ""))
         a = safe_strip(chat.get("a", ""))
 
@@ -740,7 +786,7 @@ def generate_answer(question: str, chat_history: Optional[List[Dict[str, str]]] 
         response = client.chat.completions.create(
             model=MODEL_OPENAI,
             messages=messages,
-            temperature=0,
+            temperature=0.4,
             max_tokens=500,
         )
     except RateLimitError:
