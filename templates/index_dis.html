@@ -91,7 +91,7 @@
             width: 30px;
             height: 30px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.10);
             color: #ffffff;
             display: flex;
             align-items: center;
@@ -101,16 +101,22 @@
             border: 1px solid rgba(255,255,255,0.08);
         }
 
-        .user-meta {
+        .user-dots {
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            justify-content: center;
+            gap: 3px;
+            margin-left: 10px; /* ini pengganti "3 spasi" */
         }
 
-        .user-caret {
-            font-size: 11px;
-            color: rgba(255,255,255,0.70);
-            margin-left: 2px;
+        .user-dots span {
+            width: 4px;
+            height: 4px;
+            background: rgba(255,255,255,0.75);
+            border-radius: 50%;
+            display: block;
         }
+
 
         .user-dropdown {
             position: absolute;
@@ -927,10 +933,12 @@
                         <div class="user-avatar">
                             {{ (user_name[:1] if user_name else 'U')|upper }}
                         </div>
-                        <div class="user-meta">
-                            <span class="user-greeting">Hi, <strong>{{ user_name }}</strong></span>
+
+                        <div class="user-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
                         </div>
-                        <span class="user-caret">▾</span>
                     </button>
 
                     <div id="userDropdown" class="user-dropdown">
