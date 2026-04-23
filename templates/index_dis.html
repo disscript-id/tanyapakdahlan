@@ -142,6 +142,50 @@
             gap: 12px;
         }
 
+        .ans-text {
+            position: relative;
+            color: var(--text-main);
+            white-space: pre-wrap;
+            word-break: break-word;
+            opacity: 0;
+            transform: translateY(6px);
+            animation: answerFadeIn 0.28s ease forwards;
+            will-change: opacity, transform;
+        }
+
+        .ans-text.typing::after {
+            content: "";
+            display: inline-block;
+            width: 7px;
+            height: 1.1em;
+            margin-left: 3px;
+            vertical-align: -2px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.72);
+            animation: caretBlink 0.85s ease-in-out infinite;
+        }
+
+        @keyframes answerFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes caretBlink {
+            0%, 45% {
+                opacity: 1;
+            }
+            46%, 100% {
+                opacity: 0;
+            }
+        }
+
+
         .ai-avatar {
             width: 26px;
             height: 26px;
@@ -1304,6 +1348,62 @@ function pinComposerTopThenTrackAnswer(chat, userEl, answerEl) {
     });
 }
 
+function smoothTypeText(target, fullText, options = {}) {
+    const {
+        minChunk = 1,
+        maxChunk = 3,
+        baseDelay = 18,
+        punctuationDelay = 90,
+        onProgress = null,
+        onDone = null
+    } = options;
+
+    let index = 0;
+    target.textContent = "";
+    target.classList.add("typing");
+
+    function getChunkSize(char) {
+        if (char === "\n") return 1;
+        if (char === " ") return 1;
+        if (/[.,!?;:]/.test(char)) return 1;
+        return Math.floor(Math.random() * (maxChunk - minChunk + 1)) + minChunk;
+    }
+
+    function getDelay(lastChar) {
+        if (!lastChar) return baseDelay;
+        if (lastChar === "\n") return 70;
+        if (/[.,!?]/.test(lastChar)) return punctuationDelay;
+        if (/[;:]/.test(lastChar)) return 70;
+        if (lastChar === " ") return 12;
+        return baseDelay + Math.floor(Math.random() * 10);
+    }
+
+    function step() {
+        if (index >= fullText.length) {
+            target.classList.remove("typing");
+            if (typeof onDone === "function") onDone();
+            return;
+        }
+
+        const currentChar = fullText.charAt(index);
+        const chunkSize = getChunkSize(currentChar);
+        const nextIndex = Math.min(index + chunkSize, fullText.length);
+
+        target.textContent += fullText.slice(index, nextIndex);
+        index = nextIndex;
+
+        if (typeof onProgress === "function") {
+            onProgress(index);
+        }
+
+        const lastChar = fullText.charAt(index - 1);
+        setTimeout(step, getDelay(lastChar));
+    }
+
+    step();
+}
+
+
 async function ask() {
 
                 if (!isMobileBrowser()) {
@@ -1397,30 +1497,25 @@ async function ask() {
                 let text = data.answer || "Maaf, jawaban belum tersedia.";
                 let target = ansContainer.querySelector(".ans-text");
 
-                let i = 0;
-                let speed = 10;
-
-                function typeWriter() {
-                    if (i < text.length) {
-                        target.innerText += text.charAt(i);
-                        i++;
-
-                        if (i % 3 === 0) {
+                smoothTypeText(target, text, {
+                    minChunk: 1,
+                    maxChunk: 3,
+                    baseDelay: 16,
+                    punctuationDelay: 95,
+                    onProgress: function(progressIndex) {
+                        if (progressIndex % 4 === 0) {
                             keepAnswerVisible(chat, userDiv, ansContainer, 10, 24);
                         }
 
-                        if (i % 40 === 0) {
+                        if (progressIndex % 40 === 0) {
                             resetWakeLockTimer();
                         }
-
-                        setTimeout(typeWriter, speed);
-                    } else {
+                    },
+                    onDone: function() {
                         keepAnswerVisible(chat, userDiv, ansContainer, 10, 24);
                         resetWakeLockTimer();
                     }
-                }
-
-                typeWriter();
+                });
 
             } catch (e) {
                 if (thinkingDiv.parentNode) {
