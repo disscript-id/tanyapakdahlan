@@ -869,6 +869,19 @@ def reset_my_logs():
 # =========================
 # PUBLIC ROUTES
 # =========================
+
+@app.route("/tentang")
+def tentang():
+    return render_template("tentang.html")
+
+@app.route("/disclaimer")
+def disclaimer():
+    return render_template("disclaimer.html")
+
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
+
 @app.route("/")
 def home():
     blocked = require_mobile_page()
