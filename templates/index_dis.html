@@ -67,7 +67,6 @@
         }
 
         .header-right a {
-            color: #ff9d9d;
             text-decoration: none;
         }
 
@@ -147,7 +146,9 @@
             transition: background 0.16s ease, color 0.16s ease;
         }
 
-        .dropdown-item:hover {
+        .dropdown-item:hover,
+        .dropdown-item:active,
+        .dropdown-item:focus {
             background: rgba(255,255,255,0.05);
             color: #f3f4f6;
         }
@@ -156,7 +157,9 @@
             color: #d1d5db;
         }
 
-        .dropdown-item.danger:hover {
+        .dropdown-item.danger:hover,
+        .dropdown-item.danger:active,
+        .dropdown-item.danger:focus {
             background: rgba(255,255,255,0.05);
             color: #f3f4f6;
         }
@@ -165,7 +168,9 @@
             color: #d1d5db;
         }
 
-        .logout-item:hover {
+        .logout-item:hover,
+        .logout-item:active,
+        .logout-item:focus {
             background: rgba(255,255,255,0.05);
             color: #f3f4f6;
         }
