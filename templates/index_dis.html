@@ -71,6 +71,117 @@
             text-decoration: none;
         }
 
+        .user-menu-wrap {
+            position: relative;
+        }
+
+        .user-menu-trigger {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            border: none;
+            color: #edf1f7;
+            padding: 0;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .user-meta {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-caret {
+            font-size: 11px;
+            color: rgba(255,255,255,0.70);
+            margin-left: 2px;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            min-width: 220px;
+            background: rgba(22,24,29,0.98);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+            padding: 8px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .user-dropdown.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: block;
+            width: 100%;
+            text-decoration: none;
+            color: #edf1f7;
+            font-size: 14px;
+            padding: 11px 12px;
+            border-radius: 10px;
+            transition: background 0.16s ease, color 0.16s ease;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255,255,255,0.06);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.06);
+            margin: 6px 4px;
+        }
+
+        .dropdown-item.danger {
+            color: #ffb3b3;
+        }
+
+        .dropdown-item.danger:hover {
+            background: rgba(255, 90, 90, 0.10);
+        }
+
+        .logout-item {
+            color: #ffd1d1;
+        }
+
+        .logout-item:hover {
+            background: rgba(255, 120, 120, 0.10);
+        }
+
+        @media (max-width: 480px) {
+            .user-menu-trigger {
+                gap: 6px;
+            }
+
+            .user-greeting {
+                font-size: 12px;
+            }
+
+            .user-dropdown {
+                min-width: 210px;
+                right: 0;
+            }
+        }
+
         #chatShell {
             flex: 1;
             min-height: 0;
@@ -808,10 +919,36 @@
 
     <div id="header" class="{% if not logged_in %}blurred-ui{% endif %}">
         <img class="header-logo" src="/static/icon_tanya_pak_dahlan.png" alt="Logo">
+        
         <div class="header-right">
             {% if logged_in %}
-                <span class="user-greeting">Hi, <strong>{{ user_name }}</strong></span>
-                <a href="/logout">Logout</a>
+                <div class="user-menu-wrap">
+                    <button class="user-menu-trigger" type="button" onclick="toggleUserDropdown(event)">
+                        <div class="user-avatar">
+                            {{ (user_name[:1] if user_name else 'U')|upper }}
+                        </div>
+                        <div class="user-meta">
+                            <span class="user-greeting">Hi, <strong>{{ user_name }}</strong></span>
+                        </div>
+                        <span class="user-caret">▾</span>
+                    </button>
+
+                    <div id="userDropdown" class="user-dropdown">
+                        <a href="/profile" class="dropdown-item">Profil</a>
+                        <a href="/tentang" class="dropdown-item">Tentang Aplikasi</a>
+                        <a href="/disclaimer" class="dropdown-item">Disclaimer</a>
+                        <a href="/privacy" class="dropdown-item">Kebijakan Privasi</a>
+
+                        <div class="dropdown-divider"></div>
+
+                        <a href="/hapus-riwayat-chat" class="dropdown-item danger">Hapus Riwayat Chat</a>
+                        <a href="/hapus-akun" class="dropdown-item danger">Hapus Akun</a>
+
+                        <div class="dropdown-divider"></div>
+
+                        <a href="/logout" class="dropdown-item logout-item">Keluar</a>
+                    </div>
+                </div>
             {% else %}
                 <span style="color:#cfcfcf;">Program uji coba terbatas</span>
             {% endif %}
@@ -1086,6 +1223,27 @@
             const notice = document.getElementById("desktopBlockNotice");
             if (notice) notice.style.display = "block";
         }
+
+        function toggleUserDropdown(event) {
+            event.stopPropagation();
+
+            const dropdown = document.getElementById("userDropdown");
+            if (!dropdown) return;
+
+            dropdown.classList.toggle("show");
+        }
+
+        document.addEventListener("click", function(event) {
+            const dropdown = document.getElementById("userDropdown");
+            const trigger = document.querySelector(".user-menu-trigger");
+
+            if (!dropdown || !trigger) return;
+
+            if (!trigger.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.remove("show");
+            }
+        });
+
 
         const CARD_ANIM_MS = 320;
 
